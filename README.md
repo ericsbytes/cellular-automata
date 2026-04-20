@@ -1,1 +1,3 @@
-# cellular-automata
+# Cellular Automata 🧬
+
+TODO: add README details
