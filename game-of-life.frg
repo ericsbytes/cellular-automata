@@ -21,7 +21,7 @@ pred wellformed {
 }
 
 pred init {
-    
+    // we want init state to be something that forge simulates, not chosen by us right
 }
 
 pred trace {
