@@ -1,5 +1,7 @@
 #lang forge
 
+option run_sterling "visualizer.js"
+
 sig BoardState {
     alive: set Int->Int
 }
@@ -114,7 +116,7 @@ pred rule30step {
                     let left  = add[c, -1] |
                     let right = add[c,  1] |
                     -- 100 -> 1
-                    ((0->left)  in curr.alive and (0->c) not in curr.alive and (0->right) not in curr.alive)
+                    ((0->left) in curr.alive and (0->c) not in curr.alive and (0->right) not in curr.alive)
                     or
                     -- 011 -> 1
                     ((0->left) not in curr.alive and (0->c) in curr.alive and (0->right) in curr.alive)
@@ -134,6 +136,9 @@ pred rule90 {
     
 }
 
-TwoDrule30: run {
-    oneDBoard[7]
-} for 4 Int
+OneDrule30: run {
+    wellformed
+    oneDBoard[14]
+    rule30step
+    Board.firstState.alive = 0->7 
+} for 8 BoardState, 5 Int
