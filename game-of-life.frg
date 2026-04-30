@@ -1,5 +1,7 @@
 #lang forge
 
+option run_sterling "visualizer.js"
+
 sig BoardState {
     alive: set Int->Int
 }
@@ -10,14 +12,22 @@ one sig Board {
 }
 
 pred wellformed {
-    // all s: BoardState | {
-    //     all r, c: Int | (r->c) in s.alive implies {
-    //         r >= 0
-    //         c >= 0
-    //     }
-    // }
+    // first state cannot be next of some other state
+    Board.firstState not in BoardState.(Board.next)
 
-    all s: BoardState | s not in s.^(Board.next)
+    // last state is the only one without a next state
+    one lastState: BoardState | no Board.next[lastState]
+
+    // states are linear
+    no s: BoardState | s in s.^(Board.next)
+
+    // all states should be connected
+    Board.firstState.*(Board.next) = BoardState
+}
+
+// can reach s2 from s1
+pred reachable[s1, s2: BoardState] {
+    s2 in s1.^(Board.next)
 }
 
 pred init {
@@ -111,7 +121,7 @@ pred rule30step {
                     let left  = add[c, -1] |
                     let right = add[c,  1] |
                     -- 100 -> 1
-                    ((0->left)  in curr.alive and (0->c) not in curr.alive and (0->right) not in curr.alive)
+                    ((0->left) in curr.alive and (0->c) not in curr.alive and (0->right) not in curr.alive)
                     or
                     -- 011 -> 1
                     ((0->left) not in curr.alive and (0->c) in curr.alive and (0->right) in curr.alive)
@@ -154,11 +164,13 @@ pred trace {
     
 }
 
-
-TwoDrule30: run {
-    Board.firstState.alive = (0->3)
-    board1D[7]
+OneDrule30: run {
+    wellformed
+    board1D[14]
     rule30step
-} for 4 Int, 5 BoardState
-
-
+    Board.firstState.alive = 0->7
+    all r, c: Int | {
+        c != 7 implies (r->c) not in Board.firstState.alive
+    }
+     
+} for 8 BoardState, 5 Int
