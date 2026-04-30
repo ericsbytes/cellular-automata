@@ -10,12 +10,12 @@ one sig Board {
 }
 
 pred wellformed {
-    all s: BoardState | {
-        all r, c: Int | (r->c) in s.alive implies {
-            r >= 0
-            c >= 0
-        }
-    }
+    // all s: BoardState | {
+    //     all r, c: Int | (r->c) in s.alive implies {
+    //         r >= 0
+    //         c >= 0
+    //     }
+    // }
 
     all s: BoardState | s not in s.^(Board.next)
 }
@@ -24,10 +24,7 @@ pred init {
     // we want init state to be something that forge simulates, not chosen by us right
 }
 
-pred trace {
-    init
-    
-}
+
 
 // thanks tim
 fun neighborhoods[alyv: Int->Int]: Int->Int->Int->Int {
@@ -50,22 +47,22 @@ pred step {
 }
 
 // Checks if cell will be alive in next state:
-pred willBeAlive[curr: BoardState, next: BoardState, r: Int, c: Int] {
-    Board.next[curr] = next
-    (r->c) in next.alive
-}
+// pred willBeAlive[curr: BoardState, next: BoardState, r: Int, c: Int] {
+//     Board.next[curr] = next
+//     (r->c) in next.alive
+// }
 
-// Check if a cell will die.
-pred willDie[curr: BoardState, next: BoardState, r: Int, c: Int] {
-    Board.next[curr] = next
-    (r->c) in curr.alive and (r->c) not in next.alive
-}
+// // Check if a cell will die.
+// pred willDie[curr: BoardState, next: BoardState, r: Int, c: Int] {
+//     Board.next[curr] = next
+//     (r->c) in curr.alive and (r->c) not in next.alive
+// }
 
-// Check if a cell will be born.
-pred willBeBorn[curr: BoardState, next: BoardState, r: Int, c: Int] {
-    Board.next[curr] = next
-    (r->c) not in curr.alive and (r->c) in next.alive
-}
+// // Check if a cell will be born.
+// pred willBeBorn[curr: BoardState, next: BoardState, r: Int, c: Int] {
+//     Board.next[curr] = next
+//     (r->c) not in curr.alive and (r->c) in next.alive
+// }
 
 // Checks if two states are twins
 pred twin[s1, s2: BoardState] {
@@ -106,14 +103,62 @@ pred board2D[rowSize, colSize: Int] {
     }
 }
 
-pred rule30 {
+pred rule30step {
+    all curr: BoardState | some Board.next[curr] implies {
+        let n = Board.next[curr] | n.alive = { 
+            r: Int, c: Int | r = 0 and 
+                (
+                    let left  = add[c, -1] |
+                    let right = add[c,  1] |
+                    -- 100 -> 1
+                    ((0->left)  in curr.alive and (0->c) not in curr.alive and (0->right) not in curr.alive)
+                    or
+                    -- 011 -> 1
+                    ((0->left) not in curr.alive and (0->c) in curr.alive and (0->right) in curr.alive)
+                    or
+                    -- 010 -> 1
+                    ((0->left) not in curr.alive and (0->c) in curr.alive and (0->right) not in curr.alive)
+                    or
+                    -- 001 -> 1
+                    ((0->left) not in curr.alive and (0->c) not in curr.alive and (0->right) in curr.alive)
+                )
+        }
+    }
+}
+
+
+pred rule90step {
+    all curr: BoardState | some Board.next[curr] implies {
+        let n = Board.next[curr] | n.alive = { 
+            r: Int, c: Int | r = 0 and 
+                (
+                    let left  = add[c, -1] |
+                    let right = add[c,  1] |
+                    -- 110 -> 1
+                    ((0->left) in curr.alive and (0->c) in curr.alive and (0->right) not in curr.alive)
+                    or
+                    -- 100 -> 1
+                    ((0->left) in curr.alive and (0->c) not in curr.alive and (0->right) not in curr.alive)
+                    or
+                    -- 011 -> 1
+                    ((0->left) not in curr.alive and (0->c) in curr.alive and (0->right) in curr.alive)
+                    or
+                    -- 001 -> 1
+                    ((0->left) not in curr.alive and (0->c) not in curr.alive and (0->right) in curr.alive)
+                )
+        }
+    }
+}
+
+pred trace {
     
 }
 
-pred rule90 {
-    
-}
 
-1Drule30: run {
-    
-}
+TwoDrule30: run {
+    Board.firstState.alive = (0->3)
+    board1D[7]
+    rule30step
+} for 4 Int, 5 BoardState
+
+
