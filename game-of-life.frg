@@ -88,10 +88,33 @@ assert wellformed is sat
 // Any live cell with more than three live neighbours dies, as if by overpopulation.
 // Any dead cell with exactly three live neighbours becomes a live cell, as if by reproduction.
 
-pred 1dboard {
-    
+pred 1dboard[colSize: Int] {
+    all s: BoardState | {
+        all r, c: Int | (r->c) in s.alive implies {
+            r == 0
+            c < colSize
+        }
+    }
+}
+
+pred 2dboard[rowSize, colSize: Int] {
+    all s: BoardState | {
+        all r, c: Int | (r->c) in s.alive implies {
+            r < rowSize
+            c < colSize
+        }
+    }
 }
 
 pred rule30 {
     
+}
+
+pred rule90 {
+    
+}
+
+run 1Drule30 {
+    
+    Board.firstState
 }
