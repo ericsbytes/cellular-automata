@@ -92,6 +92,25 @@ pred 1dboard {
     
 }
 
-pred rule30 {
-    
+pred rule30step {
+    all curr: BoardState | some Board.next[curr] implies {
+        let n = Board.next[curr] | n.alive = { 
+            r: Int, c: Int | r = 0 and 
+                (
+                    let left  = add[c, -1] |
+                    let right = add[c,  1] |
+                    -- 100 -> 1
+                    ((0->left)  in curr.alive and (0->c) not in curr.alive and (0->right) not in curr.alive)
+                    or
+                    -- 011 -> 1
+                    ((0->left) not in curr.alive and (0->c) in curr.alive and (0->right) in curr.alive)
+                    or
+                    -- 010 -> 1
+                    ((0->left) not in curr.alive and (0->c) in curr.alive and (0->right) not in curr.alive)
+                    or
+                    -- 001 -> 1
+                    ((0->left) not in curr.alive and (0->c) not in curr.alive and (0->right) in curr.alive)
+                )
+        }
+    }
 }
