@@ -50,22 +50,22 @@ pred step {
 }
 
 // Checks if cell will be alive in next state:
-pred willBeAlive[curr: BoardState, next: BoardState, r: Int, c: Int] {
-    Board.next[curr] = next
-    (r->c) in next.alive
-}
+// pred willBeAlive[curr: BoardState, next: BoardState, r: Int, c: Int] {
+//     Board.next[curr] = next
+//     (r->c) in next.alive
+// }
 
-// Check if a cell will die.
-pred willDie[curr: BoardState, next: BoardState, r: Int, c: Int] {
-    Board.next[curr] = next
-    (r->c) in curr.alive and (r->c) not in next.alive
-}
+// // Check if a cell will die.
+// pred willDie[curr: BoardState, next: BoardState, r: Int, c: Int] {
+//     Board.next[curr] = next
+//     (r->c) in curr.alive and (r->c) not in next.alive
+// }
 
-// Check if a cell will be born.
-pred willBeBorn[curr: BoardState, next: BoardState, r: Int, c: Int] {
-    Board.next[curr] = next
-    (r->c) not in curr.alive and (r->c) in next.alive
-}
+// // Check if a cell will be born.
+// pred willBeBorn[curr: BoardState, next: BoardState, r: Int, c: Int] {
+//     Board.next[curr] = next
+//     (r->c) not in curr.alive and (r->c) in next.alive
+// }
 
 // Checks if two states are twins
 pred twin[s1, s2: BoardState] {
@@ -88,16 +88,16 @@ assert wellformed is sat
 // Any live cell with more than three live neighbours dies, as if by overpopulation.
 // Any dead cell with exactly three live neighbours becomes a live cell, as if by reproduction.
 
-pred 1dboard[colSize: Int] {
+pred oneDBoard[colSize: Int] {
     all s: BoardState | {
         all r, c: Int | (r->c) in s.alive implies {
-            r == 0
+            r = 0
             c < colSize
         }
     }
 }
 
-pred 2dboard[rowSize, colSize: Int] {
+pred w2dboard[rowSize, colSize: Int] {
     all s: BoardState | {
         all r, c: Int | (r->c) in s.alive implies {
             r < rowSize
@@ -134,7 +134,6 @@ pred rule90 {
     
 }
 
-1Drule30: run {
-    
-    Board.firstState
-}
+TwoDrule30: run {
+    oneDBoard[7]
+} for 4 Int
