@@ -11,7 +11,7 @@ one sig Board {
 
 pred wellformed {
     all s: BoardState | {
-        all r, c: Int | (r, c) in s.alive implies {
+        all r, c: Int | (r->c) in s.alive implies {
             r >= 0
             c >= 0
         }
@@ -48,6 +48,34 @@ pred step {
     }
     
 }
+
+// Checks if cell will be alive in next state:
+pred willBeAlive[curr: BoardState, next: BoardState, r: Int, c: Int] {
+    Board.next[curr] = next
+    (r->c) in next.alive
+}
+
+// Check if a cell will die.
+pred willDie[curr: BoardState, next: BoardState, r: Int, c: Int] {
+    Board.next[curr] = next
+    (r->c) in curr.alive and (r->c) not in next.alive
+}
+
+// Check if a cell will be born.
+pred willBeBorn[curr: BoardState, next: BoardState, r: Int, c: Int] {
+    Board.next[curr] = next
+    (r->c) not in curr.alive and (r->c) in next.alive
+}
+
+// Checks if two states are twins
+pred twin[s1, s2: BoardState] {
+    some dx, dy: Int | {
+        s2.alive = { r: Int, c: Int | add[r, dx]->add[c, dy] in s1.alive }
+    }
+}
+
+
+assert wellformed is sat
 
 // possible functions or preds
 // - get neighbors
