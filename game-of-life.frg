@@ -159,9 +159,35 @@ pred rule90step {
     }
 }
 
+pred rule110step {
+    all curr: BoardState | some Board.next[curr] implies {
+        let n = Board.next[curr] | n.alive = { 
+            r: Int, c: Int | r = 0 and 
+                (
+                    let left  = add[c, -1] |
+                    let right = add[c,  1] |
+                    -- 110 -> 1
+                    ((0->left) in curr.alive and (0->c) in curr.alive and (0->right) not in curr.alive)
+                    or
+                    -- 101 -> 1
+                    ((0->left) in curr.alive and (0->c) not in curr.alive and (0->right) not in curr.alive)
+                    or
+                    -- 011 -> 1
+                    ((0->left) not in curr.alive and (0->c) in curr.alive and (0->right) in curr.alive)
+                    or
+                    -- 010 -> 1
+                    ((0->left) not in curr.alive and (0->c) in curr.alive and (0->right) not in curr.alive)
+                    or 
+                    -- 001 -> 1
+                    ((0->left) not in curr.alive and (0->c) not in curr.alive and (0->right) in curr.alive)
+                )
+        }
+    }
+}
+
 pred trace {
     wellformed
-    rule30step
+    
     Board.firstState.alive = 0->7
     all r, c: Int | {
         c != 7 implies (r->c) not in Board.firstState.alive
@@ -170,5 +196,18 @@ pred trace {
 
 OneDrule30: run {
     board1D
+    rule30step
+    trace
+} for exactly 8 BoardState, 5 Int
+
+OneDrule90: run {
+    board1D
+    rule90step
+    trace
+} for exactly 8 BoardState, 5 Int
+
+OneDrule110: run {
+    board1D
+    rule110step
     trace
 } for exactly 8 BoardState, 5 Int
