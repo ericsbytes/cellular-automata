@@ -194,6 +194,30 @@ pred trace {
     } 
 }
 
+pred garden_of_eden_r30 {
+    no prev: BoardState | {
+        prev != Board.firstState
+        Board.firstState.alive = {
+            r: Int, c: Int | r = 0 and
+            (
+                let left  = add[c, -1] |
+                let right = add[c,  1] |
+                -- 100 -> 1
+                ((0->left)  in prev.alive and (0->c) not in prev.alive and (0->right) not in prev.alive)
+                or
+                -- 011 -> 1
+                ((0->left) not in prev.alive and (0->c) in prev.alive and (0->right) in prev.alive)
+                or
+                -- 010 -> 1
+                ((0->left) not in prev.alive and (0->c) in prev.alive and (0->right) not in prev.alive)
+                or
+                -- 001 -> 1
+                ((0->left) not in prev.alive and (0->c) not in prev.alive and (0->right) in prev.alive)
+            )
+        }
+    }
+}
+
 OneDrule30: run {
     board1D
     rule30step
@@ -210,4 +234,12 @@ OneDrule110: run {
     board1D
     rule110step
     trace
-} for exactly 8 BoardState, 5 Int
+} for exactly 12 BoardState, 5 Int
+
+rule30GoE: run {
+    wellformed
+    board1D
+    some Board.firstState.alive
+    garden_of_eden_r30
+} for 2 BoardState, 5 Int
+
