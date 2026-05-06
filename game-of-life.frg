@@ -75,11 +75,7 @@ pred step {
 // }
 
 // Checks if two states are twins
-pred twin[s1, s2: BoardState] {
-    some dx, dy: Int | {
-        s2.alive = { r: Int, c: Int | add[r, dx]->add[c, dy] in s1.alive }
-    }
-}
+
 
 
 assert wellformed is sat
@@ -112,127 +108,92 @@ pred board2D[rowSize, colSize: Int] {
     }
 }
 
-pred rule30step {
-    all curr: BoardState | some Board.next[curr] implies {
-        let n = Board.next[curr] | n.alive = { 
-            r: Int, c: Int | r = 0 and 
-                (
-                    let left  = add[c, -1] |
-                    let right = add[c,  1] |
-                    -- 100 -> 1
-                    ((0->left) in curr.alive and (0->c) not in curr.alive and (0->right) not in curr.alive)
-                    or
-                    -- 011 -> 1
-                    ((0->left) not in curr.alive and (0->c) in curr.alive and (0->right) in curr.alive)
-                    or
-                    -- 010 -> 1
-                    ((0->left) not in curr.alive and (0->c) in curr.alive and (0->right) not in curr.alive)
-                    or
-                    -- 001 -> 1
-                    ((0->left) not in curr.alive and (0->c) not in curr.alive and (0->right) in curr.alive)
-                )
-        }
+pred rule30step[pre, post: BoardState] {
+    post.alive = {
+        r: Int, c: Int | r = 0 and (
+            let left  = add[c, -1] |
+            let right = add[c,  1] |
+            ((0->left)  in pre.alive and (0->c) not in pre.alive and (0->right) not in pre.alive)
+            or
+            ((0->left) not in pre.alive and (0->c)  in pre.alive and (0->right)  in pre.alive)
+            or
+            ((0->left) not in pre.alive and (0->c)  in pre.alive and (0->right) not in pre.alive)
+            or
+            ((0->left) not in pre.alive and (0->c) not in pre.alive and (0->right) in pre.alive)
+        )
     }
 }
 
-
-pred rule90step {
-    all curr: BoardState | some Board.next[curr] implies {
-        let n = Board.next[curr] | n.alive = { 
-            r: Int, c: Int | r = 0 and 
-                (
-                    let left  = add[c, -1] |
-                    let right = add[c,  1] |
-                    -- 110 -> 1
-                    ((0->left) in curr.alive and (0->c) in curr.alive and (0->right) not in curr.alive)
-                    or
-                    -- 100 -> 1
-                    ((0->left) in curr.alive and (0->c) not in curr.alive and (0->right) not in curr.alive)
-                    or
-                    -- 011 -> 1
-                    ((0->left) not in curr.alive and (0->c) in curr.alive and (0->right) in curr.alive)
-                    or
-                    -- 001 -> 1
-                    ((0->left) not in curr.alive and (0->c) not in curr.alive and (0->right) in curr.alive)
-                )
-        }
+pred rule90step[pre, post: BoardState] {
+    post.alive = {
+        r: Int, c: Int | r = 0 and (
+            let left  = add[c, -1] |
+            let right = add[c,  1] |
+            ((0->left)  in pre.alive and (0->c)  in pre.alive and (0->right) not in pre.alive)
+            or
+            ((0->left)  in pre.alive and (0->c) not in pre.alive and (0->right) not in pre.alive)
+            or
+            ((0->left) not in pre.alive and (0->c)  in pre.alive and (0->right)  in pre.alive)
+            or
+            ((0->left) not in pre.alive and (0->c) not in pre.alive and (0->right) in pre.alive)
+        )
     }
 }
 
-pred rule110step {
-    all curr: BoardState | some Board.next[curr] implies {
-        let n = Board.next[curr] | n.alive = { 
-            r: Int, c: Int | r = 0 and 
-                (
-                    let left  = add[c, -1] |
-                    let right = add[c,  1] |
-                    -- 110 -> 1
-                    ((0->left) in curr.alive and (0->c) in curr.alive and (0->right) not in curr.alive)
-                    or
-                    -- 101 -> 1
-                    ((0->left) in curr.alive and (0->c) not in curr.alive and (0->right) not in curr.alive)
-                    or
-                    -- 011 -> 1
-                    ((0->left) not in curr.alive and (0->c) in curr.alive and (0->right) in curr.alive)
-                    or
-                    -- 010 -> 1
-                    ((0->left) not in curr.alive and (0->c) in curr.alive and (0->right) not in curr.alive)
-                    or 
-                    -- 001 -> 1
-                    ((0->left) not in curr.alive and (0->c) not in curr.alive and (0->right) in curr.alive)
-                )
-        }
+pred rule110step[pre, post: BoardState] {
+    post.alive = {
+        r: Int, c: Int | r = 0 and (
+            let left  = add[c, -1] |
+            let right = add[c,  1] |
+            ((0->left)  in pre.alive and (0->c)  in pre.alive and (0->right) not in pre.alive)
+            or
+            ((0->left)  in pre.alive and (0->c) not in pre.alive and (0->right) not in pre.alive)
+            or
+            ((0->left) not in pre.alive and (0->c)  in pre.alive and (0->right)  in pre.alive)
+            or
+            ((0->left) not in pre.alive and (0->c)  in pre.alive and (0->right) not in pre.alive)
+            or
+            ((0->left) not in pre.alive and (0->c) not in pre.alive and (0->right) in pre.alive)
+        )
+    }
+}
+
+pred garden_of_eden_r30 {
+    no prev: BoardState | {
+        prev != Board.firstState
+        rule30step[prev, Board.firstState]
+    }
+}
+
+pred twin[s1, s2: BoardState] {
+    some dx, dy: Int | {
+        s2.alive = { r: Int, c: Int | add[r, dx]->add[c, dy] in s1.alive }
     }
 }
 
 pred trace {
     wellformed
-    
     Board.firstState.alive = 0->7
     all r, c: Int | {
         c != 7 implies (r->c) not in Board.firstState.alive
     } 
 }
 
-pred garden_of_eden_r30 {
-    no prev: BoardState | {
-        prev != Board.firstState
-        Board.firstState.alive = {
-            r: Int, c: Int | r = 0 and
-            (
-                let left  = add[c, -1] |
-                let right = add[c,  1] |
-                -- 100 -> 1
-                ((0->left)  in prev.alive and (0->c) not in prev.alive and (0->right) not in prev.alive)
-                or
-                -- 011 -> 1
-                ((0->left) not in prev.alive and (0->c) in prev.alive and (0->right) in prev.alive)
-                or
-                -- 010 -> 1
-                ((0->left) not in prev.alive and (0->c) in prev.alive and (0->right) not in prev.alive)
-                or
-                -- 001 -> 1
-                ((0->left) not in prev.alive and (0->c) not in prev.alive and (0->right) in prev.alive)
-            )
-        }
-    }
-}
-
 OneDrule30: run {
     board1D
-    rule30step
+    all s: BoardState | some Board.next[s] implies rule30step[s,  Board.next[s]]
     trace
 } for exactly 8 BoardState, 5 Int
 
 OneDrule90: run {
     board1D
-    rule90step
+    all s: BoardState | some Board.next[s] implies rule90step[s,  Board.next[s]]
     trace
 } for exactly 8 BoardState, 5 Int
 
 OneDrule110: run {
     board1D
-    rule110step
+    all s: BoardState | some Board.next[s] implies rule110step[s,  Board.next[s]]
     trace
 } for exactly 12 BoardState, 5 Int
 
