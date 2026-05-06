@@ -171,6 +171,33 @@ pred twin[s1, s2: BoardState] {
     }
 }
 
+pred twin_r30[bs, other: BoardState] {
+    all s1, s2, nxt1, nxt2: BoardState | {
+        s2.alive = (s1.alive - bs.alive) + other.alive
+        s1 != s2
+        rule30step[s2, nxt2]
+    } implies nxt1.alive = nxt2.alive
+}
+
+findTwin: run {
+    board1D
+    some disj bs, other: BoardState | {
+        -- ensure states found are different
+        some bs.alive
+        some other.alive
+        bs.alive != other.alive
+
+        twin_r30[bs, other]
+
+        -- find some twin
+        some s1, s2, nxt1, nxt2: BoardState | {
+            s2.alive = (s1.alive - bs.alive) + other.alive
+            rule30step[s1, nxt1]
+            rule30step[s2, nxt2]
+        }
+    }
+} for 8 BoardState, 5 Int
+
 pred trace {
     wellformed
     Board.firstState.alive = 0->7
