@@ -204,7 +204,7 @@ OneDrule90: run {
     board1D
     rule90step
     trace
-} for exactly 8 BoardState, 5 Int
+} for exactly 8 BoardState, 5 Int 
 
 OneDrule110: run {
     board1D
