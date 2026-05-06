@@ -216,7 +216,7 @@ OneDrule90: run {
     board1D
     all s: BoardState | some Board.next[s] implies rule90step[s,  Board.next[s]]
     trace
-} for exactly 8 BoardState, 5 Int
+} for exactly 8 BoardState, 5 Int 
 
 OneDrule110: run {
     board1D
