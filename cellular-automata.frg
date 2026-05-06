@@ -35,6 +35,27 @@ pred init {
 }
 
 
+
+// thanks tim
+fun neighborhoods[alyv: Int->Int]: Int->Int->Int->Int {
+    { r: Int, c: Int, r2: Int, c2: Int |
+        let rows = (add[r, 1] + r + add[r, -1]) |
+        let cols = (add[c, 1] + c + add[c, -1]) |
+            (r2->c2) in (alyv & ((rows->cols) - (r->c))) }
+}
+
+pred step {
+    all curr: BoardState | some Board.next[curr] implies {
+        let nhood = neighborhoods[curr.alive] |
+            // A cell becomes alive if it had 3 cells in the previous state.
+            let birthing =  { r: Int, c: Int | (r->c) not in curr.alive and #nhood[r][c] in 3 } |
+            // A cell survives if it had 2 or 3 neighbors in a previous state.
+            let surviving = { r: Int, c: Int | (r->c) in curr.alive and #nhood[r][c] in (2 + 3) } |
+                Board.next[curr].alive = birthing + surviving
+    }
+    
+}
+
 // Checks if cell will be alive in next state:
 // pred willBeAlive[curr: BoardState, next: BoardState, r: Int, c: Int] {
 //     Board.next[curr] = next
@@ -58,6 +79,17 @@ pred init {
 
 
 assert wellformed is sat
+
+// possible functions or preds
+// - get neighbors
+// - if a cell will die in the next state (checking neighbors)
+// - check twin
+// - check reachability (orphan)
+
+// Any live cell with fewer than two live neighbours dies, as if by underpopulation.
+// Any live cell with two or three live neighbours lives on to the next generation.
+// Any live cell with more than three live neighbours dies, as if by overpopulation.
+// Any dead cell with exactly three live neighbours becomes a live cell, as if by reproduction.
 
 pred board1D {
     all s: BoardState | {
@@ -113,7 +145,6 @@ pred rule110step[pre, post: BoardState] {
         r: Int, c: Int | r = 0 and (
             let left  = add[c, -1] |
             let right = add[c,  1] |
-            // 110 -> 1
             ((0->left)  in pre.alive and (0->c)  in pre.alive and (0->right) not in pre.alive)
             or
             // 101 -> 1
@@ -157,6 +188,33 @@ pred twin[s1, s2: BoardState] {
         s2.alive = { r: Int, c: Int | add[r, dx]->add[c, dy] in s1.alive }
     }
 }
+
+pred twin_r30[bs, other: BoardState] {
+    all s1, s2, nxt1, nxt2: BoardState | {
+        s2.alive = (s1.alive - bs.alive) + other.alive
+        s1 != s2
+        rule30step[s2, nxt2]
+    } implies nxt1.alive = nxt2.alive
+}
+
+findTwin: run {
+    board1D
+    some disj bs, other: BoardState | {
+        -- ensure states found are different
+        some bs.alive
+        some other.alive
+        bs.alive != other.alive
+
+        twin_r30[bs, other]
+
+        -- find some twin
+        some s1, s2, nxt1, nxt2: BoardState | {
+            s2.alive = (s1.alive - bs.alive) + other.alive
+            rule30step[s1, nxt1]
+            rule30step[s2, nxt2]
+        }
+    }
+} for 8 BoardState, 5 Int
 
 pred trace {
     wellformed
