@@ -194,6 +194,29 @@ function getGridDims(states) {
 }
 
 // ---------------------------------------------------------------------------
+// Get the current run statement name from Sterling's instance metadata
+// ---------------------------------------------------------------------------
+function getRunName() {
+    try {
+        // Sterling exposes an `instances` global array; each element has the run label
+        const insts = eval('instances') // eslint-disable-line no-eval
+        if (insts && insts.length > 0) {
+            // currentInstanceIndex tracks which instance is displayed
+            let idx = 0
+            try { idx = eval('currentInstanceIndex') || 0 } catch (e) {} // eslint-disable-line no-eval
+            const inst = insts[idx] || insts[0]
+            if (inst) {
+                if (typeof inst.label === 'function') return inst.label()
+                if (typeof inst.label === 'string' && inst.label) return inst.label
+                if (typeof inst.name  === 'function') return inst.name()
+                if (typeof inst.name  === 'string'   && inst.name)  return inst.name
+            }
+        }
+    } catch (e) {}
+    return null
+}
+
+// ---------------------------------------------------------------------------
 // Render
 // ---------------------------------------------------------------------------
 d3.selectAll('svg > *').remove()
@@ -214,11 +237,15 @@ if (ROWS === 0 || states.every(s => s.size === 0)) {
 
     if (is1D) {
         // ---- Spacetime diagram (1D automaton) ----
+        const totalW = PAD + LABEL_W + COLS * CELL + PAD
+        const totalH = PAD + 28 + ROWS * CELL + 32 + PAD
+        root.attr('width', totalW).attr('height', totalH)
+
         root.append('text')
             .attr('x', PAD + LABEL_W + (COLS * CELL) / 2).attr('y', PAD + 14)
             .attr('text-anchor', 'middle')
             .style('font-size', '14px').style('font-weight', 'bold').style('fill', '#222')
-            .text('Rule 30 — Spacetime Diagram')
+            .text(getRunName() || 'Spacetime Diagram')
 
         const gGrid = root.append('g')
             .attr('transform', `translate(${PAD + LABEL_W}, ${PAD + 28})`)
@@ -263,12 +290,15 @@ if (ROWS === 0 || states.every(s => s.size === 0)) {
     } else {
         // ---- 2D Game of Life: states shown side by side ----
         const stateW = COLS * CELL + 12
+        const totalW = PAD + ROWS * stateW + PAD
+        const totalH = PAD + 28 + GRID_ROWS * CELL + 32 + PAD
+        root.attr('width', totalW).attr('height', totalH)
 
         root.append('text')
             .attr('x', PAD + (ROWS * stateW) / 2).attr('y', PAD + 14)
             .attr('text-anchor', 'middle')
             .style('font-size', '14px').style('font-weight', 'bold').style('fill', '#222')
-            .text('Game of Life')
+            .text(getRunName() || 'Game of Life')
 
         for (let t = 0; t < ROWS; t++) {
             const aliveCells = states[t]
