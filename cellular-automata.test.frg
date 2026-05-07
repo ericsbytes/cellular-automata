@@ -63,8 +63,9 @@ test suite for wellformed {
 // test suite for rule110step {
 //     r110_invalidStep: assert {
 //         some disj s1, s2: BoardState | {
-//             rule110step[s1, s3]
-//             s1.alive
+//             Board.next[s1] = s2
+//             rule110step[s1, s2]
+//             s1.alive 
 //         }
 //     }
     
@@ -84,16 +85,6 @@ r30_verifyGoE: assert {
     // change pattern to verify GoE
     Board.firstState.alive = (0->-16) + (0->-15) + (0->-14) + (0->-13) + (0->-12) + (0->-11) + (0->-10) + (0->-9) + (0->-8) + (0->-7) + (0->-6) + (0->-5) + (0->-4) + (0->-3) + (0->-2) + (0->-1) + (0->0) + (0->1) + (0->2) + (0->3) + (0->4) + (0->5) + (0->6) + (0->7) + (0->8) + (0->9) + (0->10) + (0->11) + (0->12) + (0->13) + (0->14) + (0->15)
 } is unsat for exactly 2 BoardState, 5 Int
-
-// r30_verifyNonGoECheck: assert {
-//     board1D
-    
-//     // change for rule
-//     some pre: BoardState | rule30step[pre, Board.firstState]
-
-//     // change pattern to verify GoE
-//     Board.firstState.alive = (0->-4) + (0->-3) + (0->0) + (0->4)
-// } is sat for exactly 2 BoardState, 5 Int
 
 // a rule 90 GoE
 r90_verifyGoE: assert {
@@ -254,6 +245,9 @@ r30_verifyExactTwins: assert {
         rule30next[s1] = rule30next[s2]
     }
 } is sat for 5 Int
+
+
+--========================================================--
 
 // NOTE: this was used for manual testing
 // sat if it found a predecessor ot the goe candidate
