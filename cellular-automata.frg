@@ -248,7 +248,9 @@ OneDrule110: run {
 --  VERIFIER                                              --
 --========================================================--
 
-// if test fails, firstState found a candidate GoE
+
+// if test fails, firstState is a candidate GoE
+// NOTE: this is a candidate GoE *given the bounds*
 rule30GoE: assert {
     board1D 
     some Board.firstState.alive
