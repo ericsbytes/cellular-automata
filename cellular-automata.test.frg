@@ -236,7 +236,7 @@ r67_verifyNonGoE: assert {
 // "what fundamental property is wrong with this bad example"?
 // 
 
-r30_verifyExactTwins: assert {
+r30_verifyWeakTwins: assert {
     board1D
 
     some disj s1, s2: BoardState | {
