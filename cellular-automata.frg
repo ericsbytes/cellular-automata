@@ -306,7 +306,7 @@ pred strong_twin_r30[bs, other: BoardState] {
 }
 
 // NOTE: what is sound is finding "exact" twins
-r30_findExactTwin: run {
+r30_findStrongTwin: run {
     board1D
     some disj s1, s2: BoardState | {
         some s1.alive
