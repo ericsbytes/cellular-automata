@@ -11,6 +11,10 @@ one sig Board {
     next: pfunc BoardState -> BoardState
 }
 
+--========================================================--
+--  SETUP PREDICATES                                      --
+--========================================================--
+
 pred wellformed {
     // first state cannot be next of some other state
     Board.firstState not in BoardState.(Board.next)
@@ -24,44 +28,11 @@ pred wellformed {
     // all states should be connected
     Board.firstState.*(Board.next) = BoardState
 
+    // one dimensional
     board1D
 }
 
-
-// Checks if cell will be alive in next state:
-// pred willBeAlive[curr: BoardState, next: BoardState, r: Int, c: Int] {
-//     Board.next[curr] = next
-//     (r->c) in next.alive
-// }
-
-// // Check if a cell will die.
-// pred willDie[curr: BoardState, next: BoardState, r: Int, c: Int] {
-//     Board.next[curr] = next
-//     (r->c) in curr.alive and (r->c) not in next.alive
-// }
-
-// // Check if a cell will be born.
-// pred willBeBorn[curr: BoardState, next: BoardState, r: Int, c: Int] {
-//     Board.next[curr] = next
-//     (r->c) not in curr.alive and (r->c) in next.alive
-// }
-
-// Checks if two states are twins
-
-
-
 assert wellformed is sat
-
-// possible functions or preds
-// - get neighbors
-// - if a cell will die in the next state (checking neighbors)
-// - check twin
-// - check reachability (orphan)
-
-// Any live cell with fewer than two live neighbours dies, as if by underpopulation.
-// Any live cell with two or three live neighbours lives on to the next generation.
-// Any live cell with more than three live neighbours dies, as if by overpopulation.
-// Any dead cell with exactly three live neighbours becomes a live cell, as if by reproduction.
 
 pred board1D {
     all s: BoardState | {
@@ -150,36 +121,137 @@ pred rule110step[pre, post: BoardState] {
     post.alive = rule110next[pre]
 }
 
+fun rule184next[pre: BoardState]: set Int->Int {
+    {
+        r: Int, c: Int | r = 0 and (
+            let left  = add[c, -1] |
+            let right = add[c,  1] |
+            // 111 -> 1
+            ((0->left)  in pre.alive and (0->c)  in pre.alive and (0->right) not in pre.alive)
+            or
+            // 101 -> 1
+            ((0->left)  in pre.alive and (0->c) not in pre.alive and (0->right) in pre.alive)
+            or
+            // 100 -> 1
+            ((0->left) in pre.alive and (0->c) not in pre.alive and (0->right) not in pre.alive)
+            or
+            // 011 -> 1
+            ((0->left) not in pre.alive and (0->c)  in pre.alive and (0->right) in pre.alive)
+        )
+    }
+}
+
+pred rule184step[pre, post: BoardState] {
+    post.alive = rule184next[pre]
+}
+
+fun rule73next[pre: BoardState]: set Int->Int {
+    {
+        r: Int, c: Int | r = 0 and (
+            let left  = add[c, -1] |
+            let right = add[c,  1] |
+            // 110 -> 1
+            ((0->left)  in pre.alive and (0->c) in pre.alive and (0->right) not in pre.alive)
+            or
+            // 011 -> 1
+            ((0->left) not in pre.alive and (0->c)  in pre.alive and (0->right) in pre.alive)
+            or 
+            // 000 -> 1
+            ((0->left) not in pre.alive and (0->c) not in pre.alive and (0->right) not in pre.alive)
+        )
+    }
+}
+
+pred rule73step[pre, post: BoardState] {
+    post.alive = rule73next[pre]
+}
+
+fun rule45next[pre: BoardState]: set Int->Int {
+    {
+        r: Int, c: Int | r = 0 and (
+            let left  = add[c, -1] |
+            let right = add[c,  1] |
+            // 101 -> 1
+            ((0->left)  in pre.alive and (0->c) not in pre.alive and (0->right) in pre.alive)
+            or
+            // 011 -> 1
+            ((0->left) not in pre.alive and (0->c)  in pre.alive and (0->right) in pre.alive)
+            or 
+            // 010 -> 1
+            ((0->left) not in pre.alive and (0->c) in pre.alive and (0->right) not in pre.alive)
+            or
+            // 000 -> 1
+            ((0->left) not in pre.alive and (0->c) not in pre.alive and (0->right) not in pre.alive)
+        )
+    }
+}
+
+pred rule45step[pre, post: BoardState] {
+    post.alive = rule45next[pre]
+}
+
+// fun rule67next[pre: BoardState]: set Int->Int {
+//     {
+//         r: Int, c: Int | r = 0 and (
+//             let left  = add[c, -1] |
+//             let right = add[c,  1] |
+//             // 101 -> 1
+//             ((0->left)  in pre.alive and (0->c) not in pre.alive and (0->right) in pre.alive)
+//             or
+//             // 011 -> 1
+//             ((0->left) not in pre.alive and (0->c)  in pre.alive and (0->right) in pre.alive)
+//             or 
+//             // 010 -> 1
+//             ((0->left) not in pre.alive and (0->c) in pre.alive and (0->right) not in pre.alive)
+//             or
+//             // 000 -> 1
+//             ((0->left) not in pre.alive and (0->c) not in pre.alive and (0->right) not in pre.alive)
+//         )
+//     }
+// }
+
+// pred rule67step[pre, post: BoardState] {
+//     post.alive = rule45next[pre]
+// }
+
 --========================================================--
 --  TRACES                                                --
 --========================================================--
 
-
+// gives a trace that starts from a single cell at (0, 0)
 pred trace {
     wellformed
-    Board.firstState.alive = 0->7
+    Board.firstState.alive = 0->0
     all r, c: Int | {
-        c != 7 implies (r->c) not in Board.firstState.alive
+        c != 0 implies (r->c) not in Board.firstState.alive
     } 
 }
 
-OneDrule30: run {
-    board1D
+r30Trace: run {
     all s: BoardState | some Board.next[s] implies rule30step[s,  Board.next[s]]
     trace
 } for exactly 8 BoardState, 5 Int
 
-OneDrule90: run {
-    board1D
+r90Trace: run {
     all s: BoardState | some Board.next[s] implies rule90step[s,  Board.next[s]]
     trace
 } for exactly 12 BoardState, 5 Int 
 
-OneDrule110: run {
-    board1D
+r110Trace: run {
     all s: BoardState | some Board.next[s] implies rule110step[s,  Board.next[s]]
     trace
 } for exactly 12 BoardState, 5 Int
+
+r184Trace: run {
+    all s: BoardState | some Board.next[s] implies rule184step[s,  Board.next[s]]
+    trace
+} for exactly 12 BoardState, 5 Int
+
+r73Trace: run {
+    all s: BoardState | some Board.next[s] implies rule73step[s,  Board.next[s]]
+    trace
+} for exactly 12 BoardState, 5 Int
+
 
 --========================================================--
 --  TWINS                                                 --
@@ -226,46 +298,3 @@ r30_findExactTwin: run {
 // should be unsat!! but generates instances
 // probable explanation is that rule 90 is surjective in infinite grids, but because
 // it is limited to a wrap-around board, it may not be surjective anymore
-
-/*
-rule90GoE: run {
-    wellformed
-    board1D
-    all s: BoardState | some Board.next[s] implies rule90step[s,  Board.next[s]]
-    some Board.firstState.alive
-    garden_of_eden_r90
-} for exactly 3 BoardState, 5 Int
-
-rule110findOrphan: run {
-    wellformed
-    board1D
-    all s: BoardState | some Board.next[s] implies rule110step[s,  Board.next[s]]
-    some s: BoardState | r110isOrphan[s]
-} for exactly 5 BoardState, 4 Int
-
-
-rule110GoE: run {
-    wellformed
-    board1D
-    all s: BoardState | some Board.next[s] implies rule110step[s,  Board.next[s]]
-    some Board.firstState.alive
-    
-    garden_of_eden_r110
-}
-
-pred r110isOrphan[s: BoardState] {
-    no prev: BoardState | {
-        prev != s
-        rule110step[prev, s]
-    }
-    all r, c: Int | (r->c) in s.alive implies {
-        some subset: BoardState | {
-            subset.alive = s.alive - (r->c)
-            some prev: BoardState | {
-                prev != subset
-                rule110step[prev, subset]
-            }
-        }
-    }
-}
-*/

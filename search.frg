@@ -21,6 +21,18 @@ rule90GoE: assert {
     no pre: BoardState | rule90step[pre, Board.firstState]
 } is unsat for /*exactly 32 BoardState,*/ 5 Int
 
+rule110GoE: assert {
+    board1D 
+    some Board.firstState.alive
+    no pre: BoardState | rule110step[pre, Board.firstState]
+} is unsat for /*exactly 32 BoardState,*/ 5 Int
+
+rule184GoE: assert {
+    board1D 
+    some Board.firstState.alive
+    no pre: BoardState | rule184hstep[pre, Board.firstState]
+} is unsat for /*exactly 32 BoardState,*/ 5 Int
+
 
 --========================================================--
 --  TWINS                                                 --

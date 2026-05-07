@@ -109,6 +109,24 @@ verifyGoE2: assert {
     Board.firstState.alive = (0->-16) + (0->-15) + (0->-14) + (0->-13) + (0->-11) + (0->-10) + (0->-8) + (0->-7) + (0->-5) + (0->-4) + (0->-2) + (0->-1) + (0->1) + (0->2) + (0->4) + (0->5) + (0->7) + (0->8) + (0->10) + (0->11) + (0->13) + (0->14)
 } is unsat for exactly 2 BoardState, 5 Int
 
+// a rule 90 GoE
+verifyWrongGoE3: assert {
+    board1D
+    
+    // change for rule
+    some pre: BoardState | rule90step[pre, Board.firstState]
+    
+    // change pattern to verify GoE
+    Board.firstState.alive = (0->-16) + (0->-15) + (0->-14) + (0->-13) + (0->-11) + (0->-10) + (0->-8)
+} is unsat for exactly 2 BoardState, 5 Int
+
+// find something that's not a garden of eden and plug it in, expect it to fail
+// make it look for a valid predecessor
+// MAKE SURE THIS ACTUALLY HAPPENS
+
+// what if we learn something more general from the failure of a specific candidate ..? find 
+// "what fundamental property is wrong with this bad example"?
+// 
 
 r30_verifyExactTwins: assert {
     board1D

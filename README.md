@@ -19,9 +19,9 @@ How should we understand an instance of your model and what your visualization s
 
 A cellular automaton is composed of the following. A grid of cells that have set number of states (like on = 1 and off = 0), and a rule that is applied to the configuration of the cells at each "step." The rule is applied repeatedly to an initial configuration of cells and its successors (called generations). The rule is applied to every single cell in the grid and is constant over time. A popular example is Conway's Game of Life.
 
-Steven Wolfram put together a set of rules for one dimensional cellular automata, which are called elementary cellular automata. In these rules, the cell can either be alive (1) or dead (0). Their states in the next generation is dependent on their immediate neighbors. Wolfram proposed that cellular automata would be the solution to modelling natural systems, including ones in biology, chemistry and physics, rather than traditional mathematics.
+Steven Wolfram put together a set of rules for one dimensional cellular automata, which are called elementary cellular automata. In these rules, the cell can either be alive (1) or dead (0). Their states in the next generation is dependent on their immediate neighbors. Wolfram proposed that cellular automata would be the solution to modelling natural systems, including ones in biology, chemistry and physics, rather than traditional mathematics. There are 256 rules in one dimensional cellular automata.
 
-We specifically focused on a concept called the Garden of Eden. 
+We specifically focused on a concept called the Garden of Eden.
 * Garden of Eden is a configuration of cells that cannot be reached from other configurations, so essentially it can only be observed as the initial state.
 * Every Garden of Eden contains an orphan, and the orphan is the mandatory core pattern of cells that makes the garden of eden unreachable from other states. So there can be multiple gardens of eden that contain the same orphan configuration.
 
@@ -31,34 +31,38 @@ We also utilized the idea of twins.
 The Garden of Eden Theorem (Moore and Myhill): 
 * Cellular automaton in an Euclidean space is locally injective if and only if it is surjective
 * Thus it has a Garden of Eden if and only if it has twins
-* This also means that every non-local-injective rule has orphan patterns
+* This also means that every non-local-injective rule has orphan patterns.
 
 # Project Goals
 
 Our project modeled different cellular automata (CA) elementary rules that are only 1D and attempted to investigate properties about Gardens of Eden (GoE), orphans, and surjectivity of rules. 
 
-1. Model working traces of elementary cellular automata rules. 
+1. **Model working traces of elementary cellular automata rules.** 
 We have successfully modeled elementary rules such as rule 30, 90, 110. You may alter the run commands under TRACES section of cellular-automata.frg to try out more BoardStates and different bitwidths.
 
-2. Find and verify Gardens of Edens
+2. **Find and verify Gardens of Eden**
 We have partially achieved this goal. Due to reasons that will be explained further in the rest of the README, our model's functionality in finding legitimate GoEs is unreliable. On the other hand, our model is very competent in verifying that given configuration of cells are GoEs or not.
 
-3. Find and verify twins, and their relationship with GoEs
-This goal was one of our reach goals and is partially achieved. We made a strong attempt in finding twins and understanding their relationship with GoEs, but were unable to reliably model this behavior due to the reasons that will be further addressed.
+3. **Find and verify twins, and their relationship with GoEs**
+This goal was one of our reach goals and is partially achieved. Our model can find exact twins -- configurations that exactly map to the same next gen configuration. We made a strong attempt in finding twins and understanding their relationship with GoEs, but were unable to reliably model this behavior due to the reasons that will be further addressed.
+
+Our goals only slightly changed from our initial proposal, which proposed more vague versions of goals 2 and 3. We narrowed down our goals significantly into searching for GoEs and twins.
 
 # Project Design
 
 ## Overview of Sigs and Predicates
 
 ### Sigs
-
+* **BoardState:** Represents state of the board, has a set of coordinates (Int->Int) that contain coordinates of cells that are alive in that state.
+* **Board:** Represents the board, has a firstState field which is the initial BoardState and next field that maps one BoardState to the next BoardState (mapping one generation to the next).
 
 ### Predicates
+* 
 
-### Design "Aha!" Moments
+## Design "Aha!" Moments
 Initially we set up our predicates to look for configurations that cannot have predecessors. But, because forge is only looking in the given number of BoardStates, we were not getting reliable results. For example, forge could be given 8 BoardStates to look at and it might think it found a GoE because it found a set of 7 BoardStates that cannot be the predecessor to the remaining BoardState, but not necessarily because it had explored every single possible BoardStates that could be the predecessor to the supposed GoE.
 
-We shifted our approach from finding 
+We shifted our approach from finding GoEs to instead focusing on verifying them through testing known GoEs along with GoEs that our model found.
 
 # Limitations
 
