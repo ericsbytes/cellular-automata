@@ -16,7 +16,7 @@ rule30GoE: assert {
     no pre: BoardState | rule30step[pre, Board.firstState]
 } is unsat for exactly 32 BoardState, 5 Int
 
-if test fails, firstState is a candidate GoE
+// if test fails, firstState is a candidate GoE
 rule90GoE: assert {
     board1D 
     some Board.firstState.alive
