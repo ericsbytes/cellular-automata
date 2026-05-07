@@ -112,8 +112,8 @@ pred board2D[rowSize, colSize: Int] {
 --  RULES                                                 --
 --========================================================--
 
-pred rule30step[pre, post: BoardState] {
-    post.alive = {
+fun rule30next[pre: BoardState]: set Int->Int {
+    { 
         r: Int, c: Int | r = 0 and (
             let left  = add[c, -1] |
             let right = add[c,  1] |
@@ -128,8 +128,12 @@ pred rule30step[pre, post: BoardState] {
     }
 }
 
-pred rule90step[pre, post: BoardState] {
-    post.alive = {
+pred rule30step[pre, post: BoardState] {
+    post.alive = rule30next[pre]
+}
+
+fun rule90next[pre, post: BoardState]: set Int->Int {
+    {
         r: Int, c: Int | r = 0 and (
             let left  = add[c, -1] |
             let right = add[c,  1] |
@@ -144,8 +148,12 @@ pred rule90step[pre, post: BoardState] {
     }
 }
 
-pred rule110step[pre, post: BoardState] {
-    post.alive = {
+pred rule90step[pre, post: BoardState] {
+    post.alive = rule90next[pre]
+}
+
+fun rule110next[pre, post: BoardState]: set Int->Int {
+    {
         r: Int, c: Int | r = 0 and (
             let left  = add[c, -1] |
             let right = add[c,  1] |
@@ -166,40 +174,9 @@ pred rule110step[pre, post: BoardState] {
     }
 }
 
-// pred twin[s1, s2: BoardState] {
-//     some dx, dy: Int | {
-//         s2.alive = { r: Int, c: Int | add[r, dx]->add[c, dy] in s1.alive }
-//     }
-// }
-
-pred twin_r30[bs, other: BoardState] {
-    all s1, s2, nxt1, nxt2: BoardState | {
-        s2.alive = (s1.alive - bs.alive) + other.alive
-        s1.alive != s2.alive
-        rule30step[s1, nxt1]
-        rule30step[s2, nxt2]
-    } implies nxt1.alive = nxt2.alive
-    
-    -- ensure symmetry
-    all s1, s2, nxt1, nxt2: BoardState | {
-        s2.alive = (s1.alive - other.alive) + bs.alive
-        s1.alive != s2.alive
-        rule30step[s1, nxt1]
-        rule30step[s2, nxt2]
-    } implies nxt1.alive = nxt2.alive
+pred rule110step[pre, post: BoardState] {
+    post.alive = rule110next[pre]
 }
-
-findTwin: run {
-    board1D
-    some disj bs, other: BoardState | {
-        -- ensure states found are different
-        some bs.alive
-        some other.alive
-        bs.alive != other.alive
-
-        twin_r30[bs, other]
-    }
-} for 8 BoardState, 5 Int
 
 --========================================================--
 --  TRACES                                                --
@@ -232,10 +209,37 @@ OneDrule110: run {
     trace
 } for exactly 12 BoardState, 5 Int
 
+
+--========================================================--
+--  TWINS                                                 --
+--========================================================--
+
+pred twin_r30[bs, other: BoardState] {
+    all s1, s2: BoardState | {
+        s2.alive = (s1.alive - bs.alive) + other.alive implies rule30next[s1] = rule30next[s2]
+    }
+
+    all s1, s2: BoardState | {
+        s2.alive = (s1.alive - other.alive) + bs.alive implies rule30next[s1] = rule30next[s2]
+    }
+}
+
+// NOTE: again, boundedness issues might not necessarily mean its a twin
+findR30Twin: assert {
+    board1D
+    no disj s1, s2: BoardState | {
+        some s1.alive
+        some s2.alive
+        s1.alive != s2.alive
+        twin_r30[s1, s2]
+    }
+} is unsat for exactly 32 BoardState, 5 Int
+
+
+
 --========================================================--
 --  GARDENS OF EDENS                                      --
 --========================================================--
-
 
 // if test fails, firstState is a candidate GoE
 // NOTE: this is a candidate GoE *given the bounds*
