@@ -248,43 +248,20 @@ OneDrule110: run {
 --  VERIFIER                                              --
 --========================================================--
 
+// if test fails, firstState found a candidate GoE
 rule30GoE: assert {
     board1D 
-    some target: BoardState | {
-        some target.alive
-        no pre: BoardState | rule30step[pre, target]
-    }
-} is unsat for exactly 2 BoardState, 5 Int
+    some Board.firstState.alive
+    no pre: BoardState | rule30step[pre, Board.firstState]
+} is unsat for /*exactly 32 BoardState,*/ 5 Int
 
-// if UNSAT, it found a candidate GoE
+// if test fails, firstState found a candidate GoE
 rule90GoE: assert {
     board1D 
-    some target: BoardState | {
-        some target.alive
-        no pre: BoardState | rule90step[pre, target]
-    }
-} is unsat for exactly 2 BoardState, 5 Int
+    some Board.firstState.alive
+    no pre: BoardState | rule90step[pre, Board.firstState]
+} is unsat for /*exactly 32 BoardState,*/ 5 Int
 
-// verify that this is a GoE based on rule90 GoE
-verifyGoE: assert {
-    board1D
-    
-    // change for rule
-    some pre: BoardState | rule90step[pre, Board.firstState]
-    
-    // change pattern to verify GoE
-    Board.firstState.alive =
-        (0->-16) + (0->-15) + (0->-14) + (0->-13) +
-        (0->-11) + (0->-10) +
-        (0->-8)  + (0->-7)  +
-        (0->-5)  + (0->-4)  +
-        (0->-2)  + (0->-1)  +
-        (0->1)   + (0->2)   +
-        (0->4)   + (0->5)   +
-        (0->7)   + (0->8)   +
-        (0->10)  + (0->11)  +
-        (0->13)  + (0->14)
-} is unsat for exactly 2 BoardState, 5 Int
 
 
 
