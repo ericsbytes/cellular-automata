@@ -51,6 +51,15 @@ pred board2D[rowSize, colSize: Int] {
     }
 }
 
+// Helper function to get left and right neighbors
+fun left[c: Int]: Int { add[c, -1] }
+fun right[c: Int]: Int { add[c,  1] }
+
+// Helper functions to get the state of the three cells in a neighborhood
+pred leftState[pre: BoardState, c: Int] { (0->left[c]) in pre.alive }
+pred centerState[pre: BoardState, c: Int] { (0->c) in pre.alive }
+pred rightState[pre: BoardState, c: Int] { (0->right[c]) in pre.alive }
+
 --========================================================--
 --  RULES                                                 --
 --========================================================--
@@ -58,15 +67,10 @@ pred board2D[rowSize, colSize: Int] {
 fun rule30next[pre: BoardState]: set Int->Int {
     { 
         r: Int, c: Int | r = 0 and (
-            let left  = add[c, -1] |
-            let right = add[c,  1] |
-            ((0->left)  in pre.alive and (0->c) not in pre.alive and (0->right) not in pre.alive)
-            or
-            ((0->left) not in pre.alive and (0->c)  in pre.alive and (0->right)  in pre.alive)
-            or
-            ((0->left) not in pre.alive and (0->c)  in pre.alive and (0->right) not in pre.alive)
-            or
-            ((0->left) not in pre.alive and (0->c) not in pre.alive and (0->right) in pre.alive)
+            (leftState[pre, c] and not centerState[pre, c] and not rightState[pre, c]) or  // 100
+            (not leftState[pre, c] and centerState[pre, c] and rightState[pre, c]) or      // 011
+            (not leftState[pre, c] and centerState[pre, c] and not rightState[pre, c]) or  // 010
+            (not leftState[pre, c] and not centerState[pre, c] and rightState[pre, c])     // 001
         )
     }
 }
@@ -78,15 +82,10 @@ pred rule30step[pre, post: BoardState] {
 fun rule90next[pre: BoardState]: set Int->Int {
     {
         r: Int, c: Int | r = 0 and (
-            let left  = add[c, -1] |
-            let right = add[c,  1] |
-            ((0->left)  in pre.alive and (0->c)  in pre.alive and (0->right) not in pre.alive)
-            or
-            ((0->left)  in pre.alive and (0->c) not in pre.alive and (0->right) not in pre.alive)
-            or
-            ((0->left) not in pre.alive and (0->c)  in pre.alive and (0->right)  in pre.alive)
-            or
-            ((0->left) not in pre.alive and (0->c) not in pre.alive and (0->right) in pre.alive)
+            (leftState[pre, c] and centerState[pre, c] and not rightState[pre, c]) or     // 110
+            (leftState[pre, c] and not centerState[pre, c] and not rightState[pre, c]) or // 100
+            (not leftState[pre, c] and centerState[pre, c] and rightState[pre, c]) or     // 011
+            (not leftState[pre, c] and not centerState[pre, c] and rightState[pre, c])    // 001
         )
     }
 }
@@ -98,45 +97,65 @@ pred rule90step[pre, post: BoardState] {
 fun rule110next[pre: BoardState]: set Int->Int {
     {
         r: Int, c: Int | r = 0 and (
-            let left  = add[c, -1] |
-            let right = add[c,  1] |
-            ((0->left)  in pre.alive and (0->c)  in pre.alive and (0->right) not in pre.alive)
-            or
-            // 101 -> 1
-            ((0->left)  in pre.alive and (0->c) not in pre.alive and (0->right) in pre.alive)
-            or
-            // 011 -> 1
-            ((0->left) not in pre.alive and (0->c)  in pre.alive and (0->right)  in pre.alive)
-            or
-            // 010 -> 1
-            ((0->left) not in pre.alive and (0->c)  in pre.alive and (0->right) not in pre.alive)
-            or
-            // 001 -> 1
-            ((0->left) not in pre.alive and (0->c) not in pre.alive and (0->right) in pre.alive)
+            (leftState[pre, c] and centerState[pre, c] and not rightState[pre, c]) or     // 110
+            (leftState[pre, c] and not centerState[pre, c] and rightState[pre, c]) or     // 101
+            (not leftState[pre, c] and centerState[pre, c] and rightState[pre, c]) or     // 011
+            (not leftState[pre, c] and centerState[pre, c] and not rightState[pre, c]) or // 010
+            (not leftState[pre, c] and not centerState[pre, c] and rightState[pre, c])    // 001
         )
     }
 }
+
 
 pred rule110step[pre, post: BoardState] {
     post.alive = rule110next[pre]
 }
 
+// RULE 60: Pascal's triangle modulo 2 (XOR with left neighbor only)
+fun rule60next[pre: BoardState]: set Int->Int {
+    { r: Int, c: Int | r = 0 and 
+        (leftState[pre, c] xor centerState[pre, c])
+    }
+}
+
+pred rule60step[pre, post: BoardState] {
+    post.alive = rule60next[pre]
+}
+
+// RULE 102: Right-triangular rule (XOR with right neighbor only)
+fun rule102next[pre: BoardState]: set Int->Int {
+    { r: Int, c: Int | r = 0 and 
+        (centerState[pre, c] xor rightState[pre, c])
+    }
+}
+
+pred rule102step[pre, post: BoardState] {
+    post.alive = rule102next[pre]
+}
+
+fun rule170next[pre: BoardState]: set Int->Int {
+    {
+        r: Int, c: Int | r = 0 and (
+            // Cases where left neighbor is alive (1)
+            (leftState[pre, c] and centerState[pre, c] and rightState[pre, c]) or     // 111
+            (leftState[pre, c] and centerState[pre, c] and not rightState[pre, c]) or // 110
+            (leftState[pre, c] and not centerState[pre, c] and rightState[pre, c]) or // 101
+            (leftState[pre, c] and not centerState[pre, c] and not rightState[pre, c])    // 100
+        )
+    }
+}
+
+pred rule170step[pre, post: BoardState] {
+    post.alive = rule170next[pre]
+}
+
 fun rule184next[pre: BoardState]: set Int->Int {
     {
         r: Int, c: Int | r = 0 and (
-            let left  = add[c, -1] |
-            let right = add[c,  1] |
-            // 111 -> 1
-            ((0->left)  in pre.alive and (0->c)  in pre.alive and (0->right) not in pre.alive)
-            or
-            // 101 -> 1
-            ((0->left)  in pre.alive and (0->c) not in pre.alive and (0->right) in pre.alive)
-            or
-            // 100 -> 1
-            ((0->left) in pre.alive and (0->c) not in pre.alive and (0->right) not in pre.alive)
-            or
-            // 011 -> 1
-            ((0->left) not in pre.alive and (0->c)  in pre.alive and (0->right) in pre.alive)
+            (leftState[pre, c] and centerState[pre, c] and rightState[pre, c]) or     // 111 → 1
+            (leftState[pre, c] and not centerState[pre, c] and rightState[pre, c]) or // 101 → 1
+            (leftState[pre, c] and not centerState[pre, c] and not rightState[pre, c]) or // 100 → 1
+            (not leftState[pre, c] and centerState[pre, c] and rightState[pre, c])    // 011 → 1
         )
     }
 }
@@ -145,19 +164,13 @@ pred rule184step[pre, post: BoardState] {
     post.alive = rule184next[pre]
 }
 
+// Rule 73 
 fun rule73next[pre: BoardState]: set Int->Int {
     {
         r: Int, c: Int | r = 0 and (
-            let left  = add[c, -1] |
-            let right = add[c,  1] |
-            // 110 -> 1
-            ((0->left)  in pre.alive and (0->c) in pre.alive and (0->right) not in pre.alive)
-            or
-            // 011 -> 1
-            ((0->left) not in pre.alive and (0->c)  in pre.alive and (0->right) in pre.alive)
-            or 
-            // 000 -> 1
-            ((0->left) not in pre.alive and (0->c) not in pre.alive and (0->right) not in pre.alive)
+            (leftState[pre, c] and centerState[pre, c] and not rightState[pre, c]) or     // 110 → 1
+            (not leftState[pre, c] and centerState[pre, c] and rightState[pre, c]) or     // 011 → 1
+            (not leftState[pre, c] and not centerState[pre, c] and not rightState[pre, c])    // 000 → 1
         )
     }
 }
@@ -166,22 +179,14 @@ pred rule73step[pre, post: BoardState] {
     post.alive = rule73next[pre]
 }
 
+// Rule 45
 fun rule45next[pre: BoardState]: set Int->Int {
     {
         r: Int, c: Int | r = 0 and (
-            let left  = add[c, -1] |
-            let right = add[c,  1] |
-            // 101 -> 1
-            ((0->left)  in pre.alive and (0->c) not in pre.alive and (0->right) in pre.alive)
-            or
-            // 011 -> 1
-            ((0->left) not in pre.alive and (0->c)  in pre.alive and (0->right) in pre.alive)
-            or 
-            // 010 -> 1
-            ((0->left) not in pre.alive and (0->c) in pre.alive and (0->right) not in pre.alive)
-            or
-            // 000 -> 1
-            ((0->left) not in pre.alive and (0->c) not in pre.alive and (0->right) not in pre.alive)
+            (leftState[pre, c] and not centerState[pre, c] and rightState[pre, c]) or     // 101 → 1
+            (not leftState[pre, c] and centerState[pre, c] and rightState[pre, c]) or     // 011 → 1
+            (not leftState[pre, c] and centerState[pre, c] and not rightState[pre, c]) or // 010 → 1
+            (not leftState[pre, c] and not centerState[pre, c] and not rightState[pre, c])    // 000 → 1
         )
     }
 }
@@ -189,30 +194,6 @@ fun rule45next[pre: BoardState]: set Int->Int {
 pred rule45step[pre, post: BoardState] {
     post.alive = rule45next[pre]
 }
-
-// fun rule67next[pre: BoardState]: set Int->Int {
-//     {
-//         r: Int, c: Int | r = 0 and (
-//             let left  = add[c, -1] |
-//             let right = add[c,  1] |
-//             // 101 -> 1
-//             ((0->left)  in pre.alive and (0->c) not in pre.alive and (0->right) in pre.alive)
-//             or
-//             // 011 -> 1
-//             ((0->left) not in pre.alive and (0->c)  in pre.alive and (0->right) in pre.alive)
-//             or 
-//             // 010 -> 1
-//             ((0->left) not in pre.alive and (0->c) in pre.alive and (0->right) not in pre.alive)
-//             or
-//             // 000 -> 1
-//             ((0->left) not in pre.alive and (0->c) not in pre.alive and (0->right) not in pre.alive)
-//         )
-//     }
-// }
-
-// pred rule67step[pre, post: BoardState] {
-//     post.alive = rule45next[pre]
-// }
 
 --========================================================--
 --  TRACES                                                --
@@ -257,7 +238,25 @@ r73Trace: run {
 --  TWINS                                                 --
 --========================================================--
 
-pred twin_r30[bs, other: BoardState] {
+pred weak_twins_rule30 {
+    some disj s1, s2, r1, r2: BoardState | {
+        rule30step[s1, r1]
+        rule30step[s2, r2]
+        s1.alive != s2.alive
+        r1.alive = r2.alive
+    }
+}
+
+pred weak_twins_rule60 {
+    some disj s1, s2, r1, r2: BoardState | {
+        rule60step[s1, r1]
+        rule60step[s2, r2]
+        s1.alive != s2.alive
+        r1.alive = r2.alive
+    }
+}
+
+pred strong_twin_r30[bs, other: BoardState] {
     all s1, s2: BoardState | {
         s2.alive = (s1.alive - bs.alive) + other.alive implies rule30next[s1] = rule30next[s2]
     }
@@ -278,6 +277,80 @@ r30_findExactTwin: run {
     }
 } for exactly 2 BoardState, 5 Int
 
+
+
+--========================================================--
+--  PROPERTY PREDICATES                                --
+--========================================================--
+
+// Checking  if the rule is additive by finding counterexaples if it isn't. 
+// To check, fill in following predicate, then run the following
+pred isNotAdditive {
+    some disj s1, s2, sXOR, r1, r2, rXOR: BoardState | {
+        sXOR.alive = (s1.alive - s2.alive) + (s2.alive - s1.alive)
+        rule110step[s1, r1]
+        rule110step[s2, r2]
+        rule110step[sXOR, rXOR]
+        rXOR.alive != (r1.alive - r2.alive) + (r2.alive - r1.alive)
+    }
+}
+
+// If it is additive, counterexample_additive will be unsat.
+counterexample_additive: run {
+    board1D
+    all c: Int, s: BoardState  | c < -4 or c >= 7 implies (0->c) not in s.alive
+    isNotAdditive
+} for exactly 6 BoardState, 4 Int
+
+
+pred isNotInjective {
+    some s1, s2, r1, r2: BoardState | {
+        s1 != s2  // Different configurations
+        rule110step[s1, r1]
+        rule110step[s2, r2]
+        r1.alive = r2.alive  
+
+    }
+}
+
+injectivity_counterexample: run {
+    board1D
+    all c: Int, s: BoardState | c < -7 or c >= 6 implies (0->c) not in s.alive
+    isNotInjective
+} for exactly 4 BoardState, 4 Int
+
+
+pred isNotMonotonic {
+    some s1, s2, r1, r2: BoardState | {
+        // s1 is subset of s2
+        s1.alive in s2.alive
+        
+        rule60step[s1, r1]
+        rule60step[s2, r2]
+        
+        // Monotonicity VIOLATED
+        not (r1.alive in r2.alive)
+    }
+}
+
+monotonic_counterexample: run {
+    board1D
+    all c: Int, s: BoardState | c < 0 or c >= 4 implies (0->c) not in s.alive
+    isNotMonotonic
+} for exactly 5 BoardState, 4 Int
+
+pred isNotNumberConserving {
+    some s, next: BoardState | {
+        rule170step[s, next]
+        #{c: Int | (0->c) in s.alive} != #{c: Int | (0->c) in next.alive}
+    }
+}
+
+number_conserving_counterexample: run {
+    board1D
+    all c: Int, s: BoardState | c < 0 or c >= 4 implies (0->c) not in s.alive
+    isNotNumberConserving
+} for exactly 5 BoardState, 4 Int
 
 
 --========================================================--
