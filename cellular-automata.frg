@@ -162,20 +162,20 @@ pred rule102step[pre, post: BoardState] {
     post.alive = rule102next[pre]
 }
 
-fun rule232next[pre: BoardState]: set Int->Int {
+fun rule170next[pre: BoardState]: set Int->Int {
     {
         r: Int, c: Int | r = 0 and (
-            // Cases where majority is 1 (at least two live cells)
+            // Cases where left neighbor is alive (1)
             (leftState[pre, c] and centerState[pre, c] and rightState[pre, c]) or     // 111
             (leftState[pre, c] and centerState[pre, c] and not rightState[pre, c]) or // 110
             (leftState[pre, c] and not centerState[pre, c] and rightState[pre, c]) or // 101
-            (not leftState[pre, c] and centerState[pre, c] and rightState[pre, c])    // 011
+            (leftState[pre, c] and not centerState[pre, c] and not rightState[pre, c])    // 100
         )
     }
 }
 
-pred rule232step[pre, post: BoardState] {
-    post.alive = rule232next[pre]
+pred rule170step[pre, post: BoardState] {
+    post.alive = rule170next[pre]
 }
 
 --========================================================--
@@ -315,7 +315,18 @@ monotonic_counterexample: run {
     isNotMonotonic
 } for exactly 5 BoardState, 4 Int
 
+pred isNotNumberConserving {
+    some s, next: BoardState | {
+        rule170step[s, next]
+        #{c: Int | (0->c) in s.alive} != #{c: Int | (0->c) in next.alive}
+    }
+}
 
+number_conserving_counterexample: run {
+    board1D
+    all c: Int, s: BoardState | c < 0 or c >= 4 implies (0->c) not in s.alive
+    isNotNumberConserving
+} for exactly 5 BoardState, 4 Int
 
 
 --========================================================--
