@@ -19,7 +19,7 @@ How should we understand an instance of your model and what your visualization s
 
 A cellular automaton is composed of the following. A grid of cells that have set number of states (like on = 1 and off = 0), and a rule that is applied to the configuration of the cells at each "step." The rule is applied repeatedly to an initial configuration of cells and its successors (called generations). The rule is applied to every single cell in the grid and is constant over time. A popular example is Conway's Game of Life.
 
-Steven Wolfram put together a set of rules for one dimensional cellular automata, which are called elementary cellular automata. In these rules, the cell can either be alive (1) or dead (0). Their states in the next generation is dependent on their immediate neighbors. 
+Steven Wolfram put together a set of rules for one dimensional cellular automata, which are called elementary cellular automata. In these rules, the cell can either be alive (1) or dead (0). Their states in the next generation is dependent on their immediate neighbors. Wolfram proposed that cellular automata would be the solution to modelling natural systems, including ones in biology, chemistry and physics, rather than traditional mathematics.
 
 We specifically focused on a concept called the Garden of Eden. 
 * Garden of Eden is a configuration of cells that cannot be reached from other configurations, so essentially it can only be observed as the initial state.
