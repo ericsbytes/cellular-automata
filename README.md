@@ -27,23 +27,25 @@ Steven Wolfram put together a set of rules for one dimensional cellular automata
 
 We specifically focused on a concept called the **Garden of Eden**.
 
-> [!TIP]
+> [!IMPORTANT]
 > Garden of Eden is a configuration of cells that cannot be reached from other configurations, so essentially it can only be observed as the initial state
 >
 > Every Garden of Eden contains an **orphan**, and the orphan is the mandatory core pattern of cells that makes the garden of eden unreachable from other states. So there can be multiple gardens of eden that contain the same orphan configuration.
 
-We also utilized the idea of twins.
+We also utilized the idea of **twins**.
 
-> [!TIP]
+> [!IMPORTANT]
 > Twins are distinct patterns that can be interchanged with each other whenever they happen, and the overall configuration still maps to the same configuration in the next generation.
 >
 > In our project, we distinguish between so-called "weak" twins and "strong" twins. Weak twins are essentially two states that share the exact same next state (e.g. the pre-image of some state). Strong twins are two states that share the same next state with the added requirement that they have identical non-zero superset alive cells.
 
-The Garden of Eden Theorem (Moore and Myhill):
 
-- Cellular automaton in an Euclidean space is locally injective if and only if it is surjective
-- Thus it has a Garden of Eden if and only if it has twins
-- This also means that every non-local-injective rule has orphan patterns.
+> [!NOTE]
+> **The Garden of Eden Theorem (Moore and Myhill):**
+>
+> - Cellular automaton in an Euclidean space is locally injective if and only if it is surjective
+> - Thus it has a Garden of Eden if and only if it has twins
+> - This also means that every non-local-injective rule has orphan patterns.
 
 ## Project Goals
 
