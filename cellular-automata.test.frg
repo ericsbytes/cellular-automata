@@ -21,11 +21,13 @@ pred r110linearity {
 }
 
 test suite for wellformed {
+    -- Test 1: Disconnected states should violate wellformed
     GW_disconnected: assert {
         some s: BoardState | s not in Board.firstState.*(Board.next)
         wellformed
     } is unsat
-
+    
+    -- Test 2: Multiple last states should violate wellformed
     GW_moreThanOneLast: assert {
         wellformed
         some disj s1, s2: BoardState | {
@@ -33,6 +35,25 @@ test suite for wellformed {
             no Board.next[s2]
         }
     } is unsat
+    
+    -- Test 3: Cycles should violate wellformed
+    GW_cycle: assert {
+        wellformed
+        some s: BoardState | s in Board.next[s]
+    } is unsat
+    
+    -- Test 4: First state having predecessor violates wellformed
+    GW_firstHasPredecessor: assert {
+        wellformed
+        some s: BoardState | Board.next[s] = Board.firstState
+    } is unsat
+
+     GW_validTrace: assert {
+        wellformed
+        board1D
+        Board.firstState.alive = 0->0
+        all s: BoardState | some Board.next[s] implies rule30step[s, Board.next[s]]
+    } is sat for exactly 4 BoardState, 5 Int
 }
 
 test suite for rule110step {
@@ -159,12 +180,3 @@ r30_verifyExactTwins: assert {
     }
 } is sat for 5 Int
 
-query: assert {
-    board1D
-    
-    // change for rule
-    some pre: BoardState | rule30step[pre, Board.firstState]
-    
-    // change pattern to verify GoE
-    Board.firstState.alive = (0->-15) + (0->-13) + (0->-11) + (0->-9) + (0->-7) + (0->-5) + (0->-3) + (0->-1) + (0->1) + (0->3) + (0->5) + (0->7) + (0->9) + (0->11) + (0->13) + (0->14) + (0->15)
-} is unsat for exactly 2 BoardState, 5 Int
