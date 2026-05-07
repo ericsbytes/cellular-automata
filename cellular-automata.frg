@@ -162,6 +162,22 @@ pred rule102step[pre, post: BoardState] {
     post.alive = rule102next[pre]
 }
 
+fun rule232next[pre: BoardState]: set Int->Int {
+    {
+        r: Int, c: Int | r = 0 and (
+            // Cases where majority is 1 (at least two live cells)
+            (leftState[pre, c] and centerState[pre, c] and rightState[pre, c]) or     // 111
+            (leftState[pre, c] and centerState[pre, c] and not rightState[pre, c]) or // 110
+            (leftState[pre, c] and not centerState[pre, c] and rightState[pre, c]) or // 101
+            (not leftState[pre, c] and centerState[pre, c] and rightState[pre, c])    // 011
+        )
+    }
+}
+
+pred rule232step[pre, post: BoardState] {
+    post.alive = rule232next[pre]
+}
+
 --========================================================--
 --  TRACES                                                --
 --========================================================--
@@ -278,6 +294,26 @@ injectivity_counterexample: run {
     all c: Int, s: BoardState | c < -7 or c >= 6 implies (0->c) not in s.alive
     isNotInjective
 } for exactly 4 BoardState, 4 Int
+
+
+pred isNotMonotonic {
+    some s1, s2, r1, r2: BoardState | {
+        // s1 is subset of s2
+        s1.alive in s2.alive
+        
+        rule60step[s1, r1]
+        rule60step[s2, r2]
+        
+        // Monotonicity VIOLATED
+        not (r1.alive in r2.alive)
+    }
+}
+
+monotonic_counterexample: run {
+    board1D
+    all c: Int, s: BoardState | c < 0 or c >= 4 implies (0->c) not in s.alive
+    isNotMonotonic
+} for exactly 5 BoardState, 4 Int
 
 
 
