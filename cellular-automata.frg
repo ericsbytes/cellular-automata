@@ -27,31 +27,6 @@ pred wellformed {
     board1D
 }
 
-// can reach s2 from s1
-pred reachable[s1, s2: BoardState] {
-    s2 in s1.^(Board.next)
-}å
-
-
-// thanks tim
-fun neighborhoods[alyv: Int->Int]: Int->Int->Int->Int {
-    { r: Int, c: Int, r2: Int, c2: Int |
-        let rows = (add[r, 1] + r + add[r, -1]) |
-        let cols = (add[c, 1] + c + add[c, -1]) |
-            (r2->c2) in (alyv & ((rows->cols) - (r->c))) }
-}
-
-pred step {
-    all curr: BoardState | some Board.next[curr] implies {
-        let nhood = neighborhoods[curr.alive] |
-            // A cell becomes alive if it had 3 cells in the previous state.
-            let birthing =  { r: Int, c: Int | (r->c) not in curr.alive and #nhood[r][c] in 3 } |
-            // A cell survives if it had 2 or 3 neighbors in a previous state.
-            let surviving = { r: Int, c: Int | (r->c) in curr.alive and #nhood[r][c] in (2 + 3) } |
-                Board.next[curr].alive = birthing + surviving
-    }
-    
-}
 
 // Checks if cell will be alive in next state:
 // pred willBeAlive[curr: BoardState, next: BoardState, r: Int, c: Int] {
