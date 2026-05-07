@@ -335,7 +335,6 @@ pred isNotInjective {
         rule110step[s1, r1]
         rule110step[s2, r2]
         r1.alive = r2.alive  
-
     }
 }
 

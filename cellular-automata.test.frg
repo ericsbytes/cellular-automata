@@ -106,7 +106,7 @@ r90_verifyGoE: assert {
     Board.firstState.alive = (0->-16) + (0->-15) + (0->-14) + (0->-13) + (0->-11) + (0->-10) + (0->-8) + (0->-7) + (0->-5) + (0->-4) + (0->-2) + (0->-1) + (0->1) + (0->2) + (0->4) + (0->5) + (0->7) + (0->8) + (0->10) + (0->11) + (0->13) + (0->14)
 } is unsat for exactly 2 BoardState, 5 Int
 
-verifyGoE3: assert {
+r90_verifyGoE2: assert {
     board1D
     
     // change for rule
@@ -116,43 +116,11 @@ verifyGoE3: assert {
     Board.firstState.alive = (0->-15) + (0->-13) + (0->-11) + (0->-9) + (0->-7) + (0->-5) + (0->-3) + (0->-1) + (0->1) + (0->3) + (0->5) + (0->7) + (0->9) + (0->11) + (0->13) + (0->14)
 } is unsat for exactly 2 BoardState, 5 Int
 
-verifyGoE4: assert {
+r90_verifyGoE3: assert {
     board1D
     
     // change for rule
     some pre: BoardState | rule90step[pre, Board.firstState]
-    
-    // change pattern to verify GoE
-    Board.firstState.alive = (0->-8) + (0->-4) + (0->0) + (0->1) + (0->2) + (0->3) + (0->6)
-} is unsat for exactly 2 BoardState, 5 Int
-
-
-verifyGoE3: assert {
-    board1D
-    
-    // change for rule
-    some pre: BoardState | rule90step[pre, Board.firstState]
-    
-    // change pattern to verify GoE
-    Board.firstState.alive = (0->-15) + (0->-13) + (0->-11) + (0->-9) + (0->-7) + (0->-5) + (0->-3) + (0->-1) + (0->1) + (0->3) + (0->5) + (0->7) + (0->9) + (0->11) + (0->13) + (0->14)
-} is unsat for exactly 2 BoardState, 5 Int
-
-
-verifyWrongGoE3: assert {
-    board1D
-    
-    // change for rule
-    some pre: BoardState | rule90step[pre, Board.firstState]
-    
-    // change pattern to verify GoE
-    Board.firstState.alive = (0->-16) + (0->-15) + (0->-14) + (0->-13) + (0->-11) + (0->-10) + (0->-8)
-} is unsat for exactly 2 BoardState, 5 Int
-
-verifyGoE4: assert {
-    board1D
-    
-    // change for rule
-    some pre: BoardState | rule110step[pre, Board.firstState]
     
     // change pattern to verify GoE
     Board.firstState.alive = (0->-8) + (0->-4) + (0->0) + (0->1) + (0->2) + (0->3) + (0->6)
@@ -168,17 +136,6 @@ r110_verifyGoE: assert {
     Board.firstState.alive = (0->1) + (0->3)
 } is unsat for exactly 2 BoardState, 5 Int
 
-
-// r90_verifyNonGoECheck: assert {
-//     board1D
-    
-//     // change for rule
-//     some pre: BoardState | rule90step[pre, Board.firstState]
-
-//     // change pattern to verify GoE
-//     Board.firstState.alive = (0->-3) + (0->-2) + (0->2) + (0->3)
-// } is sat for exactly 2 BoardState, 5 Int
-
 r110_verifyGoE: assert {
     board1D
     
@@ -188,16 +145,6 @@ r110_verifyGoE: assert {
     // change pattern to verify GoE
     Board.firstState.alive = (0->1) + (0->3)
 } is unsat for exactly 2 BoardState, 5 Int
-
-// r110_verifyNonGoECheck: assert {
-//     board1D
-    
-//     // change for rule
-//     some pre: BoardState | rule90step[pre, Board.firstState]
-
-//     // change pattern to verify GoE
-//     Board.firstState.alive = (0->-3) + (0->-2) + (0->2) + (0->3)
-// } is sat for exactly 2 BoardState, 5 Int
 
 --========================================================--
 --  VERIFY NON-GOE                                        --
