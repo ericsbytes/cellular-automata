@@ -183,16 +183,25 @@ pred garden_of_eden_r110 {
     }
 }
 
-pred twin[s1, s2: BoardState] {
-    some dx, dy: Int | {
-        s2.alive = { r: Int, c: Int | add[r, dx]->add[c, dy] in s1.alive }
-    }
-}
+// pred twin[s1, s2: BoardState] {
+//     some dx, dy: Int | {
+//         s2.alive = { r: Int, c: Int | add[r, dx]->add[c, dy] in s1.alive }
+//     }
+// }
 
 pred twin_r30[bs, other: BoardState] {
     all s1, s2, nxt1, nxt2: BoardState | {
         s2.alive = (s1.alive - bs.alive) + other.alive
-        s1 != s2
+        s1.alive != s2.alive
+        rule30step[s1, nxt1]
+        rule30step[s2, nxt2]
+    } implies nxt1.alive = nxt2.alive
+    
+    -- ensure symmetry
+    all s1, s2, nxt1, nxt2: BoardState | {
+        s2.alive = (s1.alive - other.alive) + bs.alive
+        s1.alive != s2.alive
+        rule30step[s1, nxt1]
         rule30step[s2, nxt2]
     } implies nxt1.alive = nxt2.alive
 }
@@ -206,13 +215,6 @@ findTwin: run {
         bs.alive != other.alive
 
         twin_r30[bs, other]
-
-        -- find some twin
-        some s1, s2, nxt1, nxt2: BoardState | {
-            s2.alive = (s1.alive - bs.alive) + other.alive
-            rule30step[s1, nxt1]
-            rule30step[s2, nxt2]
-        }
     }
 } for 8 BoardState, 5 Int
 
@@ -242,20 +244,49 @@ OneDrule110: run {
     trace
 } for exactly 12 BoardState, 5 Int
 
-rule30GoE: run {
-    wellformed
-    board1D
-    some Board.firstState.alive
-    garden_of_eden_r30
-} for exactly 3 BoardState, 5 Int
+--========================================================--
+--  VERIFIER                                              --
+--========================================================--
 
-// should be unsat!!
-rule90GoE: run {
-    wellformed
+rule30GoE: assert {
+    board1D 
+    some target: BoardState | {
+        some target.alive
+        no pre: BoardState | rule30step[pre, target]
+    }
+} is unsat for exactly 2 BoardState, 5 Int
+
+// if UNSAT, it found a candidate GoE
+rule90GoE: assert {
+    board1D 
+    some target: BoardState | {
+        some target.alive
+        no pre: BoardState | rule90step[pre, target]
+    }
+} is unsat for exactly 2 BoardState, 5 Int
+
+// verify that this is a GoE based on rule90 GoE
+verifyGoE: assert {
     board1D
-    some Board.firstState.alive
-    garden_of_eden_r90
-} for exactly 3 BoardState, 5 Int
+    
+    // change for rule
+    some pre: BoardState | rule90step[pre, Board.firstState]
+    
+    // change pattern to verify GoE
+    Board.firstState.alive =
+        (0->-16) + (0->-15) + (0->-14) + (0->-13) +
+        (0->-11) + (0->-10) +
+        (0->-8)  + (0->-7)  +
+        (0->-5)  + (0->-4)  +
+        (0->-2)  + (0->-1)  +
+        (0->1)   + (0->2)   +
+        (0->4)   + (0->5)   +
+        (0->7)   + (0->8)   +
+        (0->10)  + (0->11)  +
+        (0->13)  + (0->14)
+} is unsat for exactly 2 BoardState, 5 Int
+
+
 
 // possible expansions
 // - given a configuration, attempt to verify if it's orphan or not
