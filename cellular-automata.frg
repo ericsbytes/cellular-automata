@@ -232,6 +232,11 @@ r30Trace: run {
     trace
 } for exactly 8 BoardState, 5 Int
 
+r45Trace: run {
+    all s: BoardState | some Board.next[s] implies rule45step[s,  Board.next[s]]
+    trace
+} for exactly 8 BoardState, 5 Int
+
 r60Trace: run {
     all s: BoardState | some Board.next[s] implies rule60step[s,  Board.next[s]]
     trace
