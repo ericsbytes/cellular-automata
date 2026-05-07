@@ -2,6 +2,10 @@
 
 open "cellular-automata.frg"
 
+--========================================================--
+--  HELPER PREDICATES                                     --
+--========================================================--
+
 pred r30linearity {
     all disj s1, s2: BoardState | {
         Board.next[s1] = s2 implies rule30step[s1, s2]
@@ -35,59 +39,22 @@ test suite for wellformed {
     } is unsat
 }
 
-test suite for rule110step {
-    // example r110SmallestOrphan is {garden_of_eden_r110} for {
-    //     // smallest known orphan is 01010
-    //     Board = `Board0
-    //     BoardState = `s0 + `s1 + `s2
-    //     `Board0.firstState = `s0
-    //     `Board0.next = `s0 -> `s1 + `s1 -> `s2
-    //     `s0.alive = (0->1) + (0->3)
-    //     `s1.alive = none->none
-    //     `s2.alive = none->none
-    // }
-
-    
-}
-/*
-r110_goeExists: assert { // might be buggy
-    wellformed
-    board1D
-    r110linearity
-    garden_of_eden_r110
-} is sat for exactly 3 BoardState, 4 Int
-*/
-
-// r30_goeIffTwin: assert {
+// test suite for rule110step {
+//     r110_invalidStep: assert {
+//         some disj s1, s2: BoardState | {
+//             rule110step[s1, s3]
+//             s1.alive
+//         }
+//     }
     
 // }
-/*
-test suite for rule90step {
-    r90_goeExists: assert {
-        wellformed
-        board1D
-        r90linearity
-        garden_of_eden_r90
-    } is sat for exactly 3 BoardState, 4 Int
 
-    // r90_all
-}
-*/
-r110_verifyKnownOrphan: assert {
-    wellformed
-    board1D
-    r110linearity
-    some s: BoardState | {
-        some orphan: BoardState | {
-            s != orphan
-            orphan.alive = (0->1) + (0->3)
-            rule110step[s, orphan]
-        }
-    }
-} is unsat for exactly 3 BoardState, 4 Int
+--========================================================--
+--  VERIFY GARDEN OF EDEN                                 --
+--========================================================--
 
 // a rule 30 GoE
-verifyGoE1: assert {
+r30_verifyGoE: assert {
     board1D
     
     // change for rule
@@ -97,9 +64,18 @@ verifyGoE1: assert {
     Board.firstState.alive = (0->-16) + (0->-15) + (0->-14) + (0->-13) + (0->-12) + (0->-11) + (0->-10) + (0->-9) + (0->-8) + (0->-7) + (0->-6) + (0->-5) + (0->-4) + (0->-3) + (0->-2) + (0->-1) + (0->0) + (0->1) + (0->2) + (0->3) + (0->4) + (0->5) + (0->6) + (0->7) + (0->8) + (0->9) + (0->10) + (0->11) + (0->12) + (0->13) + (0->14) + (0->15)
 } is unsat for exactly 2 BoardState, 5 Int
 
+// r30_verifyNonGoECheck: assert {
+//     board1D
+    
+//     // change for rule
+//     some pre: BoardState | rule30step[pre, Board.firstState]
+
+//     // change pattern to verify GoE
+//     Board.firstState.alive = (0->-4) + (0->-3) + (0->0) + (0->4)
+// } is sat for exactly 2 BoardState, 5 Int
 
 // a rule 90 GoE
-verifyGoE2: assert {
+r90_verifyGoE: assert {
     board1D
     
     // change for rule
@@ -109,16 +85,120 @@ verifyGoE2: assert {
     Board.firstState.alive = (0->-16) + (0->-15) + (0->-14) + (0->-13) + (0->-11) + (0->-10) + (0->-8) + (0->-7) + (0->-5) + (0->-4) + (0->-2) + (0->-1) + (0->1) + (0->2) + (0->4) + (0->5) + (0->7) + (0->8) + (0->10) + (0->11) + (0->13) + (0->14)
 } is unsat for exactly 2 BoardState, 5 Int
 
-// a rule 90 GoE
-verifyWrongGoE3: assert {
+// r90_verifyNonGoECheck: assert {
+//     board1D
+    
+//     // change for rule
+//     some pre: BoardState | rule90step[pre, Board.firstState]
+
+//     // change pattern to verify GoE
+//     Board.firstState.alive = (0->-3) + (0->-2) + (0->2) + (0->3)
+// } is sat for exactly 2 BoardState, 5 Int
+
+r110_verifyGoE: assert {
     board1D
     
     // change for rule
-    some pre: BoardState | rule90step[pre, Board.firstState]
+    some pre: BoardState | rule110step[pre, Board.firstState]
     
     // change pattern to verify GoE
-    Board.firstState.alive = (0->-16) + (0->-15) + (0->-14) + (0->-13) + (0->-11) + (0->-10) + (0->-8)
+    Board.firstState.alive = (0->1) + (0->3)
 } is unsat for exactly 2 BoardState, 5 Int
+
+// r110_verifyNonGoECheck: assert {
+//     board1D
+    
+//     // change for rule
+//     some pre: BoardState | rule90step[pre, Board.firstState]
+
+//     // change pattern to verify GoE
+//     Board.firstState.alive = (0->-3) + (0->-2) + (0->2) + (0->3)
+// } is sat for exactly 2 BoardState, 5 Int
+
+--========================================================--
+--  VERIFY NON-GOE                                        --
+--========================================================--
+
+r30_verifyNonGoE: assert {
+    wellformed
+    // change for rule
+    some disj pre, target: BoardState | {
+        Board.next[pre] = target
+        rule30step[pre, target]
+        target.alive = (0->-4) + (0->-3) + (0->0) + (0->4)
+    }
+} is sat for exactly 2 BoardState, 5 Int 
+
+r90_verifyNonGoE: assert {
+    wellformed
+    // change for rule
+    some disj pre, target: BoardState | {
+        Board.next[pre] = target
+        rule90step[pre, target]
+        target.alive = (0->-3) + (0->-2) + (0->2) + (0->3)
+    }
+} is sat for exactly 2 BoardState, 5 Int
+
+r110_verifyNonGoE: assert {
+    wellformed
+    // change for rule
+    some disj pre, target: BoardState | {
+        Board.next[pre] = target
+        rule110step[pre, target]
+        target.alive = (0->-3) + (0->-2) + (0->2) + (0->3)
+    }
+} is sat for exactly 2 BoardState, 5 Int
+
+r110_verifyNonGoE2: assert {
+    wellformed
+    // change for rule
+    some disj pre, target: BoardState | {
+        Board.next[pre] = target
+        rule110step[pre, target]
+        target.alive = (0->-5) + (0->-4) + (0->-2) + (0->-1) + (0->0) + (0->2) + (0->3) + (0->4) + (0->5)
+    }
+} is sat for exactly 2 BoardState, 5 Int
+
+// just in case, test a goe
+r110_verifyGoEHasNoPrev: assert {
+    wellformed
+    // change for rule
+    some disj pre, target: BoardState | {
+        Board.next[pre] = target
+        rule110step[pre, target]
+        target.alive = (0->1) + (0->3)
+    }
+} is unsat for exactly 2 BoardState, 5 Int
+
+r184_verifyNonGoE: assert {
+    wellformed
+    // change for rule
+    some disj pre, target: BoardState | {
+        Board.next[pre] = target
+        rule184step[pre, target]
+        target.alive = (0->-5) + (0->-4) + (0->-2) + (0->-1) + (0->0) + (0->2) + (0->3) + (0->4) + (0->5)
+    }
+} is sat for exactly 2 BoardState, 5 Int
+
+r45_verifyNonGoE: assert {
+    wellformed
+    // change for rule
+    some disj pre, target: BoardState | {
+        Board.next[pre] = target
+        rule45step[pre, target]
+        target.alive = (0->-2) + (0->-1) + (0->0) + (0->1)
+    }
+} is sat for exactly 2 BoardState, 5 Int
+
+r67_verifyNonGoE: assert {
+    wellformed
+    // change for rule
+    some disj pre, target: BoardState | {
+        Board.next[pre] = target
+        rule67step[pre, target]
+        target.alive = (0->-2) + (0->-1) + (0->0) + (0->1)
+    }
+} is sat for exactly 2 BoardState, 5 Int
 
 // find something that's not a garden of eden and plug it in, expect it to fail
 // make it look for a valid predecessor

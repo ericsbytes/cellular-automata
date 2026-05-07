@@ -190,29 +190,26 @@ pred rule45step[pre, post: BoardState] {
     post.alive = rule45next[pre]
 }
 
-// fun rule67next[pre: BoardState]: set Int->Int {
-//     {
-//         r: Int, c: Int | r = 0 and (
-//             let left  = add[c, -1] |
-//             let right = add[c,  1] |
-//             // 101 -> 1
-//             ((0->left)  in pre.alive and (0->c) not in pre.alive and (0->right) in pre.alive)
-//             or
-//             // 011 -> 1
-//             ((0->left) not in pre.alive and (0->c)  in pre.alive and (0->right) in pre.alive)
-//             or 
-//             // 010 -> 1
-//             ((0->left) not in pre.alive and (0->c) in pre.alive and (0->right) not in pre.alive)
-//             or
-//             // 000 -> 1
-//             ((0->left) not in pre.alive and (0->c) not in pre.alive and (0->right) not in pre.alive)
-//         )
-//     }
-// }
+fun rule67next[pre: BoardState]: set Int->Int {
+    {
+        r: Int, c: Int | r = 0 and (
+            let left  = add[c, -1] |
+            let right = add[c,  1] |
+            // 110 -> 1
+            ((0->left)  in pre.alive and (0->c) in pre.alive and (0->right) not in pre.alive)
+            or
+            // 001 -> 1
+            ((0->left) not in pre.alive and (0->c) not in pre.alive and (0->right) in pre.alive)
+            or 
+            // 000 -> 1
+            ((0->left) not in pre.alive and (0->c) not in pre.alive and (0->right) not in pre.alive)
+        )
+    }
+}
 
-// pred rule67step[pre, post: BoardState] {
-//     post.alive = rule45next[pre]
-// }
+pred rule67step[pre, post: BoardState] {
+    post.alive = rule67next[pre]
+}
 
 --========================================================--
 --  TRACES                                                --
@@ -249,6 +246,11 @@ r184Trace: run {
 
 r73Trace: run {
     all s: BoardState | some Board.next[s] implies rule73step[s,  Board.next[s]]
+    trace
+} for exactly 12 BoardState, 5 Int
+
+r67Trace: run {
+    all s: BoardState | some Board.next[s] implies rule67step[s,  Board.next[s]]
     trace
 } for exactly 12 BoardState, 5 Int
 
