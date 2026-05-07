@@ -193,40 +193,6 @@ OneDrule110: run {
     trace
 } for exactly 12 BoardState, 5 Int
 
---========================================================--
---  Preds                                                 --
---========================================================--
-
-//Provind additive rules
-pred rule60_isAdditive {
-    all s1, s2, sXOR, r1, r2, rXOR: BoardState | {
-        // Define XOR of two states
-        sXOR.alive = (s1.alive - s2.alive) + (s2.alive - s1.alive)
-        
-        rule60step[s1, r1]
-        rule60step[s2, r2]
-        rule60step[sXOR, rXOR]
-        
-        rXOR.alive = (r1.alive - r2.alive) + (r2.alive - r1.alive)
-    }
-}
-fun negate[c: Int]: Int {
-    0 - c
-}
-
-//Proving mirrored rules
-pred rule102_isMirrorOf_rule60 {
-    all s, mirrored, r60, r102: BoardState | {
-        // Mirror configuration: swap left and right
-        mirrored.alive = { r: Int, c: Int | (0->negate[c]) in s.alive }
-        
-        rule60step[s, r60]
-        rule102step[mirrored, r102]
-        
-        // Mirror the rule 60 result should equal rule 102 result
-        r102.alive = { r: Int, c: Int | (0->negate[c]) in r60.alive }
-    }
-}
 
 --========================================================--
 --  TWINS                                                 --
@@ -277,6 +243,52 @@ r30_findExactTwin: run {
 --  PROPERTY PREDICATES                                --
 --========================================================--
 
+//Provind additive rules
+pred rule60_isAdditive {
+    all s1, s2, sXOR, r1, r2, rXOR: BoardState | {
+        // Define XOR of two states
+        sXOR.alive = (s1.alive - s2.alive) + (s2.alive - s1.alive)
+        
+        rule60step[s1, r1]
+        rule60step[s2, r2]
+        rule60step[sXOR, rXOR]
+        
+        rXOR.alive = (r1.alive - r2.alive) + (r2.alive - r1.alive)
+    }
+}
+fun negate[c: Int]: Int {
+    0 - c
+}
+
+//Proving mirrored rules
+pred rule102_isMirrorOf_rule60 {
+    all s, mirrored, r60, r102: BoardState | {
+        // Mirror configuration: swap left and right
+        mirrored.alive = { r: Int, c: Int | (0->negate[c]) in s.alive }
+        
+        rule60step[s, r60]
+        rule102step[mirrored, r102]
+        
+        // Mirror the rule 60 result should equal rule 102 result
+        r102.alive = { r: Int, c: Int | (0->negate[c]) in r60.alive }
+    }
+}
+
+
+pred isInjective90 {
+    all s1, s2: BoardState | {
+        some r1, r2: BoardState | rule90step[s1, r1] and rule90step[s2, r2] and r1.alive = r2.alive
+        implies s1.alive = s2.alive
+    }
+}
+
+pred isSurjective90 {
+    all post: BoardState | some pre: BoardState | rule90step[pre, post]
+}
+
+pred isBijective90 {
+    isInjective90 and isSurjective90
+}
 
 
 
