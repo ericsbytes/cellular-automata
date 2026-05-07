@@ -13,7 +13,7 @@ const d3 = require('d3')
   each Atom has .id() -> string. For Int atoms, id() is the integer as a string.
 */
 
-const CELL = 28
+const CELL = 32
 const PAD  = 20
 const LABEL_W = 48
 
