@@ -140,6 +140,28 @@ pred rule110step[pre, post: BoardState] {
     post.alive = rule110next[pre]
 }
 
+// RULE 60: Pascal's triangle modulo 2 (XOR with left neighbor only)
+fun rule60next[pre: BoardState]: set Int->Int {
+    { r: Int, c: Int | r = 0 and 
+        (leftState[pre, c] xor centerState[pre, c])
+    }
+}
+
+pred rule60step[pre, post: BoardState] {
+    post.alive = rule60next[pre]
+}
+
+// RULE 102: Right-triangular rule (XOR with right neighbor only)
+fun rule102next[pre: BoardState]: set Int->Int {
+    { r: Int, c: Int | r = 0 and 
+        (centerState[pre, c] xor rightState[pre, c])
+    }
+}
+
+pred rule102step[pre, post: BoardState] {
+    post.alive = rule102next[pre]
+}
+
 --========================================================--
 --  TRACES                                                --
 --========================================================--
@@ -172,10 +194,63 @@ OneDrule110: run {
 } for exactly 12 BoardState, 5 Int
 
 --========================================================--
+--  Preds                                                 --
+--========================================================--
+
+//Provind additive rules
+pred rule60_isAdditive {
+    all s1, s2, sXOR, r1, r2, rXOR: BoardState | {
+        // Define XOR of two states
+        sXOR.alive = (s1.alive - s2.alive) + (s2.alive - s1.alive)
+        
+        rule60step[s1, r1]
+        rule60step[s2, r2]
+        rule60step[sXOR, rXOR]
+        
+        rXOR.alive = (r1.alive - r2.alive) + (r2.alive - r1.alive)
+    }
+}
+fun negate[c: Int]: Int {
+    0 - c
+}
+
+//Proving mirrored rules
+pred rule102_isMirrorOf_rule60 {
+    all s, mirrored, r60, r102: BoardState | {
+        // Mirror configuration: swap left and right
+        mirrored.alive = { r: Int, c: Int | (0->negate[c]) in s.alive }
+        
+        rule60step[s, r60]
+        rule102step[mirrored, r102]
+        
+        // Mirror the rule 60 result should equal rule 102 result
+        r102.alive = { r: Int, c: Int | (0->negate[c]) in r60.alive }
+    }
+}
+
+--========================================================--
 --  TWINS                                                 --
 --========================================================--
 
-pred twin_r30[bs, other: BoardState] {
+pred weak_twins_rule30 {
+    some disj s1, s2, r1, r2: BoardState | {
+        rule30step[s1, r1]
+        rule30step[s2, r2]
+        s1.alive != s2.alive
+        r1.alive = r2.alive
+    }
+}
+
+pred weak_twins_rule60 {
+    some disj s1, s2, r1, r2: BoardState | {
+        rule60step[s1, r1]
+        rule60step[s2, r2]
+        s1.alive != s2.alive
+        r1.alive = r2.alive
+    }
+}
+
+pred strong_twin_r30[bs, other: BoardState] {
     all s1, s2: BoardState | {
         s2.alive = (s1.alive - bs.alive) + other.alive implies rule30next[s1] = rule30next[s2]
     }
