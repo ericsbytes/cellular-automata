@@ -243,19 +243,25 @@ r30_findExactTwin: run {
 --  PROPERTY PREDICATES                                --
 --========================================================--
 
-//Provind additive rules
-pred rule60_isAdditive {
-    all s1, s2, sXOR, r1, r2, rXOR: BoardState | {
-        // Define XOR of two states
+// Checking  if the rule is additive by finding counterexaples if it isn't. 
+// To check, fill in following predicate, then run the following
+pred isNotAdditive {
+    some s1, s2, sXOR, r1, r2, rXOR: BoardState | {
         sXOR.alive = (s1.alive - s2.alive) + (s2.alive - s1.alive)
-        
-        rule60step[s1, r1]
-        rule60step[s2, r2]
-        rule60step[sXOR, rXOR]
-        
-        rXOR.alive = (r1.alive - r2.alive) + (r2.alive - r1.alive)
+        rule90step[s1, r1]
+        rule90step[s2, r2]
+        rule90step[sXOR, rXOR]
+        rXOR.alive != (r1.alive - r2.alive) + (r2.alive - r1.alive)
     }
 }
+
+// If it is additive, counterexample_additive will be unsat.
+counterexample_additive: run {
+    board1D
+    all c: Int, s: BoardState  | c < 0 or c >= 4 implies (0->c) not in s.alive
+    isNotAdditive
+} for exactly 6 BoardState, 4 Int
+
 fun negate[c: Int]: Int {
     0 - c
 }
