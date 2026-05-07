@@ -116,6 +116,7 @@ r90_verifyGoE2: assert {
     Board.firstState.alive = (0->-15) + (0->-13) + (0->-11) + (0->-9) + (0->-7) + (0->-5) + (0->-3) + (0->-1) + (0->1) + (0->3) + (0->5) + (0->7) + (0->9) + (0->11) + (0->13) + (0->14)
 } is unsat for exactly 2 BoardState, 5 Int
 
+
 r90_verifyGoE3: assert {
     board1D
     
@@ -126,14 +127,19 @@ r90_verifyGoE3: assert {
     Board.firstState.alive = (0->-8) + (0->-4) + (0->0) + (0->1) + (0->2) + (0->3) + (0->6)
 } is unsat for exactly 2 BoardState, 5 Int
 
-r110_verifyGoE: assert {
+// found goe through synthesis and verification
+r90_verifyGOE4: assert {
     board1D
-    
-    // change for rule
-    some pre: BoardState | rule110step[pre, Board.firstState]
-    
-    // change pattern to verify GoE
-    Board.firstState.alive = (0->1) + (0->3)
+
+    some pre: BoardState | rule90step[pre, Board.firstState]
+
+    Board.firstState.alive = (0->-15) + (0->-13) + (0->-11) + (0->-9) + (0->-7) + (0->-5) + (0->-3) + (0->-1) + (0->1) + (0->3) + (0->5) + (0->7) + (0->9) + (0->11) + (0->14)
+} is unsat for exactly 2 BoardState, 5 Int
+
+r90_verifyGOE5: assert {
+    board1D
+    some pre: BoardState | rule90step[pre, Board.firstState]
+    Board.firstState.alive = (0->-15) + (0->-13) + (0->-11) + (0->-9) + (0->-7) + (0->-5) + (0->-3) + (0->-1) + (0->1) + (0->3) + (0->5) + (0->7) + (0->9) + (0->11) + (0->13)
 } is unsat for exactly 2 BoardState, 5 Int
 
 r110_verifyGoE: assert {
@@ -207,7 +213,7 @@ r184_verifyNonGoE: assert {
     some disj pre, target: BoardState | {
         Board.next[pre] = target
         rule184step[pre, target]
-        target.alive = (0->-5) + (0->-4) + (0->-2) + (0->-1) + (0->0) + (0->2) + (0->3) + (0->4) + (0->5)
+        target.alive = (0->0) + (0->2) + (0->4)
     }
 } is sat for exactly 2 BoardState, 5 Int
 
@@ -249,13 +255,14 @@ r30_verifyExactTwins: assert {
     }
 } is sat for 5 Int
 
-
+// NOTE: this was used for manual testing
+// sat if it found a predecessor ot the goe candidate
 query: assert {
     board1D
     
     // change for rule
-    some pre: BoardState | rule30step[pre, Board.firstState]
+    some pre: BoardState | rule90step[pre, Board.firstState]
     
     // change pattern to verify GoE
-    Board.firstState.alive = (0->-15) + (0->-13) + (0->-11) + (0->-9) + (0->-7) + (0->-5) + (0->-3) + (0->-1) + (0->1) + (0->3) + (0->5) + (0->7) + (0->9) + (0->11) + (0->13) + (0->14) + (0->15)
+    Board.firstState.alive = (0->-12) + (0->-10) + (0->-7) + (0->-4) + (0->-2) + (0->0) + (0->4) + (0->6) + (0->8) + (0->12) + (0->14)
 } is unsat for exactly 2 BoardState, 5 Int
