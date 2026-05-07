@@ -15,7 +15,7 @@ What assumptions did you make about scope? What are the limits of your model?
 Did your goals change at all from your proposal? Did you realize anything you planned was unrealistic, or that anything you thought was unrealistic was doable?
 How should we understand an instance of your model and what your visualization shows (whether custom or default)?
 
-# Short Background
+## Short Background
 
 A **cellular automaton** or (**CA** for short) is composed of the following:
 
@@ -43,54 +43,72 @@ The Garden of Eden Theorem (Moore and Myhill):
 - Thus it has a Garden of Eden if and only if it has twins
 - This also means that every non-local-injective rule has orphan patterns.
 
-# Project Goals
+## Project Goals
 
 Our project modeled different cellular automata (CA) elementary rules that are only 1D and attempted to investigate properties about Gardens of Eden (GoE), orphans, and surjectivity of rules.
 
 1. **Model working traces of elementary cellular automata rules.**
-   We have successfully modeled elementary rules such as [rule 30](https://en.wikipedia.org/wiki/Rule_30), [90](https://en.wikipedia.org/wiki/Rule_90), [110](https://en.wikipedia.org/wiki/Rule_110), [184](https://en.wikipedia.org/wiki/Rule_184), [73](https://atlas.wolfram.com/01/01/73/), [67](https://atlas.wolfram.com/01/01/67/). You may alter the run commands under **TRACES** section of [`cellular-automata.frg`](cellular-automata.frg) to try out more `BoardStates` and different bitwidths.
+
+> [!WARNING]
+> A visualizer is provided for tracing, but it should **only be used for tracing.** The visualizer is not intended to visualize generated candidates for GoEs or twins. We recommend using the Evaluator and the verification systems in [search.frg](search.frg) and [cellular-automata.test.frg](cellular-automata.test.frg) with the associated [to-board.sh](to-board.sh) file to verify and examine Forge-generated candidates.
+
+    We have successfully modeled elementary rules such as [rule 30](https://en.wikipedia.org/wiki/Rule_30), [90](https://en.wikipedia.org/wiki/Rule_90), [110](https://en.wikipedia.org/wiki/Rule_110), [184](https://en.wikipedia.org/wiki/Rule_184), [73](https://atlas.wolfram.com/01/01/73/), [67](https://atlas.wolfram.com/01/01/67/). You may alter the run commands under **TRACES** section of [`cellular-automata.frg`](cellular-automata.frg) to try out more `BoardStates` and different bitwidths.
 
 2. **Verify properties about rules, such as montonicity, injectivity and addivity.**
-   We were able to successfully verify which of the three each rule obeyed. Our model is able to display counter-examples of these instances in when any of them are violated.
+
+    We were able to successfully verify which of the three each rule obeyed. Our model is able to display counter-examples of these instances in when any of them are violated.
 
 3. **Find and verify Gardens of Eden**
-   We have partially achieved this goal. Due to reasons that will be explained further in the rest of the `README`, our model's functionality in finding legitimate GoEs is unreliable. On the other hand, our model is very competent in verifying that given configuration of cells are GoEs or not.
+
+    We have partially achieved this goal. Due to reasons that will be explained further in the rest of the `README`, our model's functionality in finding legitimate GoEs is unreliable. On the other hand, our model is very competent in verifying that given configuration of cells are GoEs or not.
 
 4. **Find and verify twins, and their relationship with GoEs**
-   This goal was one of our reach goals and is partially achieved. Our model can find _strong_ twins -- configurations that exactly map to the same next gen configuration. We made a strong attempt in finding weak twins and understanding their relationship with GoEs, but were unable to reliably model this behavior due to the reasons that will be further addressed.
+
+    This goal was one of our reach goals and is partially achieved. Our model can find _strong_ twins -- configurations that exactly map to the same next gen configuration. We made a strong attempt in finding weak twins and understanding their relationship with GoEs, but were unable to reliably model this behavior due to the reasons that will be further addressed.
 
 Our goals only slightly changed from our initial proposal, which proposed more vague versions of goals 2 and 3. We narrowed down our goals significantly into searching for GoEs and twins.
 
-# Project Design
+## Project Design
 
-## Overview of Sigs and Predicates
+### Overview of Sigs and Predicates
 
-### Sigs
+#### Sigs
 
 | Sig          | Purpose                                                                                                                                                                           |
 | ------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `BoardState` | Represents state of the board, has a set of coordinates (Int->Int) that contain coordinates of cells that are alive in that state.                                                |
 | `Board`      | Represents the board, has a firstState field which is the initial BoardState and next field that maps one BoardState to the next BoardState (mapping one generation to the next). |
 
-
-### Predicates
+#### Predicates
 
 -
 
-## Design "Aha!" Moments
+### Design "Aha!" Moments
 
 Initially we set up our predicates to look for configurations that cannot have predecessors. But, because Forge is only looking in the given number of `BoardState`s, we were not getting reliable results. For example, forge could be given 8 `BoardState`s to look at and it might think it found a GoE because it found a set of 7 `BoardState`s that cannot be the predecessor to the remaining `BoardState`, but not necessarily because it had explored every single possible `BoardState`s that could be the predecessor to the supposed GoE.
 
 We shifted our approach from finding GoEs to instead focusing on verifying them through testing known GoEs along with GoEs that our model found. Verifying known GoEs is a tractable problem that Forge is able to solve soundly. This is because it fixes the board we're verifying, and looking for a `BoardState` that could have formed the fixed state.
 
-# Limitations
+## Limitations
 
 The biggest issues we ran into were due to boundedness of Forge and our misjudgement in what problem we were trying to solve. We initially planned to create a model that would find orphan patterns and GoEs, and that soon proved to be problematic. Our issue is not unique to Forge, but any bounded solver.
 
-We run into a similar issue with finding twins. Two states are considered twin states if a subset of one state could be replaced with another, and they both still form the same pattern. Because this requires reasoning across all possible subset states and superset states, this was simply intractable with Forge. 
+We run into a similar issue with finding twins. Two states are considered twin states if a subset of one state could be replaced with another, and they both still form the same pattern. Because this requires reasoning across all possible subset states and superset states, this was simply intractable with Forge.
 
 Our design choices also led to some limitations in our models. First, because of the wraparound function of our grid, rules that wouldn't have GoEs in an infinite grid (e.g. Rule 90) actually had GoEs in our semi-infinite grid. We verified that this is indeed the case using our verifier.
 
-# Further Expansions
+## Further Expansions
 
 Our biggest expansion and next step would be to try modelling this in a CEGIS solver instead to synethesize potential GoEs for CAs. Our goal with this project was to generate and verify candidate solution states, which is exactly what CEGIS solvers inherently are built to do.
+
+## Collaboration
+[Jessi Shin](https://github.com/jessiiishin/)  
+[Eric Wu](https://github.com/ericsbytes/)  
+[Yevhen Burkovskyi](https://github.com/AncientBehemoth-droid)
+
+### AI Use
+Our team used Claude Sonnet 4.6 for assistance.
+
+Primarily, this was to verify and debug bugs in our predicates and functions. This included passing in `BoardState` instances and getting Claude to independently verify that the state generated by Forge was indeed a twin or GoE.
+
+Additionally, we would also ask Claude for help with certain design choices and implementations. This included asking it to explain missing constraints, and how we ought to write predictions and functions in a way to followed best practices, such as DRY.
