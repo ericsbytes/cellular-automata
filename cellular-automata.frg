@@ -324,7 +324,6 @@ pred isNotAdditive {
 // If it is additive, counterexample_additive will be unsat.
 counterexample_additive: run {
     board1D
-    all c: Int, s: BoardState  | c < -4 or c >= 7 implies (0->c) not in s.alive
     isNotAdditive
 } for exactly 6 BoardState, 4 Int
 
@@ -340,7 +339,6 @@ pred isNotInjective {
 
 injectivity_counterexample: run {
     board1D
-    all c: Int, s: BoardState | c < -7 or c >= 6 implies (0->c) not in s.alive
     isNotInjective
 } for exactly 4 BoardState, 4 Int
 
@@ -360,7 +358,6 @@ pred isNotMonotonic {
 
 monotonic_counterexample: run {
     board1D
-    all c: Int, s: BoardState | c < 0 or c >= 4 implies (0->c) not in s.alive
     isNotMonotonic
 } for exactly 5 BoardState, 4 Int
 
@@ -373,7 +370,6 @@ pred isNotNumberConserving {
 
 number_conserving_counterexample: run {
     board1D
-    all c: Int, s: BoardState | c < 0 or c >= 4 implies (0->c) not in s.alive
     isNotNumberConserving
 } for exactly 5 BoardState, 4 Int
 
