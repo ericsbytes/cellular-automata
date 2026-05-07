@@ -59,15 +59,26 @@ test suite for rule110step {
             }
         }
     } is unsat for exactly 3 BoardState, 4 Int
+}
 
-    r110_goeExists: assert { // might be buggy
-        wellformed
-        board1D
-        r110linearity
-        garden_of_eden_r110
-    } is sat for exactly 3 BoardState, 4 Int
+r110_goeExists: assert { // might be buggy
+    wellformed
+    board1D
+    r110linearity
+    garden_of_eden_r110
+} is sat for exactly 3 BoardState, 4 Int
+
+r30_goeIffTwin: assert {
+    twin
 }
 
 test suite for rule90step {
-    
+    r90_goeExists: assert {
+        wellformed
+        board1D
+        r90linearity
+        garden_of_eden_r90
+    } is sat for exactly 3 BoardState, 4 Int
+
+    // r90_all
 }

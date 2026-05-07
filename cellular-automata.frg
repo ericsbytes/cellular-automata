@@ -23,6 +23,8 @@ pred wellformed {
 
     // all states should be connected
     Board.firstState.*(Board.next) = BoardState
+
+    board1D
 }
 
 // can reach s2 from s1
@@ -163,23 +165,53 @@ pred rule110step[pre, post: BoardState] {
 }
 
 pred garden_of_eden_r30 {
-    no prev: BoardState | {
-        prev != Board.firstState
-        rule30step[prev, Board.firstState]
+    some goe: BoardState | {
+        no prev: BoardState | {
+            prev != goe
+            rule30step[prev, goe]
+        }
     }
 }
 
+// no prev: BoardState | {
+//         prev != Board.firstState
+//         rule30step[prev, Board.firstState]
+//     }
+
 pred garden_of_eden_r90 {
-    no prev: BoardState | {
-        prev != Board.firstState
-        rule90step[prev, Board.firstState]
+     some goe: BoardState | {
+        no prev: BoardState | {
+            prev != goe
+            rule90step[prev, goe]
+        }
     }
+
+    // no prev: BoardState | {
+    //     prev != Board.firstState
+    //     rule90step[prev, Board.firstState]
+    // }
 }
 
 pred garden_of_eden_r110 {
     no prev: BoardState | {
         prev != Board.firstState
         rule110step[prev, Board.firstState]
+    }
+}
+
+pred r110isOrphan[s: BoardState] {
+    no prev: BoardState | {
+        prev != s
+        rule110step[prev, s]
+    }
+    all r, c: Int | (r->c) in s.alive implies {
+        some subset: BoardState | {
+            subset.alive = s.alive - (r->c)
+            some prev: BoardState | {
+                prev != subset
+                rule110step[prev, subset]
+            }
+        }
     }
 }
 
@@ -245,17 +277,39 @@ OneDrule110: run {
 rule30GoE: run {
     wellformed
     board1D
+    all s: BoardState | some Board.next[s] implies rule30step[s,  Board.next[s]]
     some Board.firstState.alive
     garden_of_eden_r30
 } for exactly 3 BoardState, 5 Int
 
-// should be unsat!!
+rule110findOrphan: run {
+    wellformed
+    board1D
+    all s: BoardState | some Board.next[s] implies rule110step[s,  Board.next[s]]
+    some s: BoardState | r110isOrphan[s]
+} for exactly 5 BoardState, 4 Int
+
+// should be unsat!! but generates instances
+// probable explanation is that rule 90 is surjective in infinite grids, but because
+// it is limited to a wrap-around board, it may not be surjective anymore
 rule90GoE: run {
     wellformed
     board1D
+    all s: BoardState | some Board.next[s] implies rule90step[s,  Board.next[s]]
     some Board.firstState.alive
     garden_of_eden_r90
 } for exactly 3 BoardState, 5 Int
+
+rule110GoE: run {
+    wellformed
+    board1D
+    all s: BoardState | some Board.next[s] implies rule110step[s,  Board.next[s]]
+    some Board.firstState.alive
+    
+    garden_of_eden_r110
+}
+
+
 
 // possible expansions
 // - given a configuration, attempt to verify if it's orphan or not
