@@ -132,7 +132,7 @@ These are split between in [`cellular-automata.frg`](cellular-automata.frg) and 
 
 | Run                  | Description                                     |
 | -------------------- | ----------------------------------------------- |
-| `r██_findStrongTwin` | Soundly find two strong twins for a given rule. |
+| `r██_findWeakTwin` | Soundly find two weak twins for a given rule. |
 | `r██_findTwin` | Finds a candidate strong twin pair. Unsound due to limitations. |
 | `r██_verifyTwin` | Attempts to verify that a pair of twins are indeed twins. Unsound due to limitations. |
 
