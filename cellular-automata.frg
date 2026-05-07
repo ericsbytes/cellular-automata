@@ -23,17 +23,14 @@ pred wellformed {
 
     // all states should be connected
     Board.firstState.*(Board.next) = BoardState
+
+    board1D
 }
 
 // can reach s2 from s1
 pred reachable[s1, s2: BoardState] {
     s2 in s1.^(Board.next)
-}
-
-pred init {
-    // we want init state to be something that forge simulates, not chosen by us right
-}
-
+}å
 
 
 // thanks tim
@@ -257,11 +254,52 @@ rule90GoE: assert {
 } is unsat for /*exactly 32 BoardState,*/ 5 Int
 
 
-
-
 // possible expansions
 // - given a configuration, attempt to verify if it's orphan or not
 // - attempt to verify twins <=> orphans
 // - verify that when a rule is not supposed to have orphans, it doesn't generate orphans
 // - find more orphans by restricting boring configurations
 // - bijective <=> twins
+
+rule110findOrphan: run {
+    wellformed
+    board1D
+    all s: BoardState | some Board.next[s] implies rule110step[s,  Board.next[s]]
+    some s: BoardState | r110isOrphan[s]
+} for exactly 5 BoardState, 4 Int
+
+// should be unsat!! but generates instances
+// probable explanation is that rule 90 is surjective in infinite grids, but because
+// it is limited to a wrap-around board, it may not be surjective anymore
+rule90GoE: run {
+    wellformed
+    board1D
+    all s: BoardState | some Board.next[s] implies rule90step[s,  Board.next[s]]
+    some Board.firstState.alive
+    garden_of_eden_r90
+} for exactly 3 BoardState, 5 Int
+
+rule110GoE: run {
+    wellformed
+    board1D
+    all s: BoardState | some Board.next[s] implies rule110step[s,  Board.next[s]]
+    some Board.firstState.alive
+    
+    garden_of_eden_r110
+}
+
+pred r110isOrphan[s: BoardState] {
+    no prev: BoardState | {
+        prev != s
+        rule110step[prev, s]
+    }
+    all r, c: Int | (r->c) in s.alive implies {
+        some subset: BoardState | {
+            subset.alive = s.alive - (r->c)
+            some prev: BoardState | {
+                prev != subset
+                rule110step[prev, subset]
+            }
+        }
+    }
+}

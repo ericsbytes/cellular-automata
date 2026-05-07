@@ -47,30 +47,43 @@ test suite for rule110step {
     //     `s2.alive = none->none
     // }
 
-    r110_verifyKnownOrphan: assert {
-        wellformed
-        board1D
-        r110linearity
-        some s: BoardState | {
-            some orphan: BoardState | {
-                s != orphan
-                orphan.alive = (0->1) + (0->3)
-                rule110step[s, orphan]
-            }
-        }
-    } is unsat for exactly 3 BoardState, 4 Int
-
-    r110_goeExists: assert { // might be buggy
-        wellformed
-        board1D
-        r110linearity
-        garden_of_eden_r110
-    } is sat for exactly 3 BoardState, 4 Int
-}
-
-test suite for rule90step {
     
 }
+
+r110_goeExists: assert { // might be buggy
+    wellformed
+    board1D
+    r110linearity
+    garden_of_eden_r110
+} is sat for exactly 3 BoardState, 4 Int
+
+// r30_goeIffTwin: assert {
+    
+// }
+
+test suite for rule90step {
+    r90_goeExists: assert {
+        wellformed
+        board1D
+        r90linearity
+        garden_of_eden_r90
+    } is sat for exactly 3 BoardState, 4 Int
+
+    // r90_all
+}
+
+r110_verifyKnownOrphan: assert {
+    wellformed
+    board1D
+    r110linearity
+    some s: BoardState | {
+        some orphan: BoardState | {
+            s != orphan
+            orphan.alive = (0->1) + (0->3)
+            rule110step[s, orphan]
+        }
+    }
+} is unsat for exactly 3 BoardState, 4 Int
 
 // a rule 30 GoE
 verifyGoE1: assert {
@@ -94,4 +107,3 @@ verifyGoE2: assert {
     // change pattern to verify GoE
     Board.firstState.alive = (0->-16) + (0->-15) + (0->-14) + (0->-13) + (0->-11) + (0->-10) + (0->-8) + (0->-7) + (0->-5) + (0->-4) + (0->-2) + (0->-1) + (0->1) + (0->2) + (0->4) + (0->5) + (0->7) + (0->8) + (0->10) + (0->11) + (0->13) + (0->14)
 } is unsat for exactly 2 BoardState, 5 Int
-
