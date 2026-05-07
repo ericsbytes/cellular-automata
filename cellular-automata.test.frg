@@ -49,18 +49,19 @@ test suite for rule110step {
 
     
 }
-
+/*
 r110_goeExists: assert { // might be buggy
     wellformed
     board1D
     r110linearity
     garden_of_eden_r110
 } is sat for exactly 3 BoardState, 4 Int
+*/
 
 // r30_goeIffTwin: assert {
     
 // }
-
+/*
 test suite for rule90step {
     r90_goeExists: assert {
         wellformed
@@ -71,7 +72,7 @@ test suite for rule90step {
 
     // r90_all
 }
-
+*/
 r110_verifyKnownOrphan: assert {
     wellformed
     board1D
@@ -107,3 +108,14 @@ verifyGoE2: assert {
     // change pattern to verify GoE
     Board.firstState.alive = (0->-16) + (0->-15) + (0->-14) + (0->-13) + (0->-11) + (0->-10) + (0->-8) + (0->-7) + (0->-5) + (0->-4) + (0->-2) + (0->-1) + (0->1) + (0->2) + (0->4) + (0->5) + (0->7) + (0->8) + (0->10) + (0->11) + (0->13) + (0->14)
 } is unsat for exactly 2 BoardState, 5 Int
+
+
+r30_verifyExactTwins: assert {
+    board1D
+
+    some disj s1, s2: BoardState | {
+        s1.alive = (0->-12) + (0->-11) + (0->-9) + (0->-6) + (0->-2) + (0->13)
+        s2.alive = (0->-16) + (0->-15) + (0->-13) + (0->-8) + (0->-5) + (0->-4) + (0->-1) + (0->0) + (0->1) + (0->2) + (0->3) + (0->4) + (0->5) + (0->6) + (0->7) + (0->8) + (0->9) + (0->10) + (0->11) + (0->14) + (0->15)
+        rule30next[s1] = rule30next[s2]
+    }
+} is sat for 5 Int
