@@ -26,7 +26,7 @@ We specifically focused on a concept called the Garden of Eden.
 * Every Garden of Eden contains an orphan, and the orphan is the mandatory core pattern of cells that makes the garden of eden unreachable from other states. So there can be multiple gardens of eden that contain the same orphan configuration.
 
 We also utilized the idea of twins.
-* Twins are distinct configurations that map to the same configuration in the next generation.
+* Twins are distinct patterns that can be interchanged with each other whenever they happen, and the overall configuration still maps to the same configuration in the next generation.
 
 The Garden of Eden Theorem (Moore and Myhill): 
 * Cellular automaton in an Euclidean space is locally injective if and only if it is surjective
@@ -55,6 +55,16 @@ This goal was one of our reach goals and is partially achieved. We made a strong
 
 ### Predicates
 
+### Design "Aha!" Moments
+Initially we set up our predicates to look for configurations that cannot have predecessors. But, because forge is only looking in the given number of BoardStates, we were not getting reliable results. For example, forge could be given 8 BoardStates to look at and it might think it found a GoE because it found a set of 7 BoardStates that cannot be the predecessor to the remaining BoardState, but not necessarily because it had explored every single possible BoardStates that could be the predecessor to the supposed GoE.
+
+We shifted our approach from finding 
+
 # Limitations
+
+The biggest issues we ran into were due to boundedness of forge and our misjudgement in what problem we were trying to solve. We initially planned to create a model that would find orphan patterns and GoEs, and that soon proved to be problematic. 
+
+First, because of the wraparound function of our grid, rules that wouldn't have GoEs in an infinite grid (e.g. Rule 90) actually had GoEs in our semi-infinite grid.
+
 
 # Further Expansions
