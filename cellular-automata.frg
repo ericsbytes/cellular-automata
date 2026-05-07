@@ -105,6 +105,10 @@ pred board2D[rowSize, colSize: Int] {
     }
 }
 
+--========================================================--
+--  RULES                                                 --
+--========================================================--
+
 pred rule30step[pre, post: BoardState] {
     post.alive = {
         r: Int, c: Int | r = 0 and (
@@ -159,41 +163,6 @@ pred rule110step[pre, post: BoardState] {
     }
 }
 
-pred garden_of_eden_r30 {
-    some goe: BoardState | {
-        no prev: BoardState | {
-            prev != goe
-            rule30step[prev, goe]
-        }
-    }
-}
-
-// no prev: BoardState | {
-//         prev != Board.firstState
-//         rule30step[prev, Board.firstState]
-//     }
-
-pred garden_of_eden_r90 {
-     some goe: BoardState | {
-        no prev: BoardState | {
-            prev != goe
-            rule90step[prev, goe]
-        }
-    }
-
-    // no prev: BoardState | {
-    //     prev != Board.firstState
-    //     rule90step[prev, Board.firstState]
-    // }
-}
-
-pred garden_of_eden_r110 {
-    no prev: BoardState | {
-        prev != Board.firstState
-        rule110step[prev, Board.firstState]
-    }
-}
-
 pred r110isOrphan[s: BoardState] {
     no prev: BoardState | {
         prev != s
@@ -239,6 +208,11 @@ findTwin: run {
     }
 } for 8 BoardState, 5 Int
 
+--========================================================--
+--  TRACES                                                --
+--========================================================--
+
+
 pred trace {
     wellformed
     Board.firstState.alive = 0->7
@@ -266,15 +240,17 @@ OneDrule110: run {
 } for exactly 12 BoardState, 5 Int
 
 --========================================================--
---  VERIFIER                                              --
+--  GARDENS OF EDENS                                      --
 --========================================================--
 
-// if test fails, firstState found a candidate GoE
+
+// if test fails, firstState is a candidate GoE
+// NOTE: this is a candidate GoE *given the bounds*
 rule30GoE: assert {
     board1D 
     some Board.firstState.alive
     no pre: BoardState | rule30step[pre, Board.firstState]
-} is unsat for /*exactly 32 BoardState,*/ 5 Int
+} is unsat for exactly 32 BoardState, 5 Int
 
 // if test fails, firstState found a candidate GoE
 rule90GoE: assert {
