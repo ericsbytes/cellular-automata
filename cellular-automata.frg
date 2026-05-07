@@ -80,6 +80,15 @@ pred board2D[rowSize, colSize: Int] {
     }
 }
 
+// Helper function to get left and right neighbors
+fun left[c: Int]: Int { add[c, -1] }
+fun right[c: Int]: Int { add[c,  1] }
+
+// Helper functions to get the state of the three cells in a neighborhood
+pred leftState[pre: BoardState, c: Int] { (0->left[c]) in pre.alive }
+pred centerState[pre: BoardState, c: Int] { (0->c) in pre.alive }
+pred rightState[pre: BoardState, c: Int] { (0->right[c]) in pre.alive }
+
 --========================================================--
 --  RULES                                                 --
 --========================================================--
@@ -87,15 +96,10 @@ pred board2D[rowSize, colSize: Int] {
 fun rule30next[pre: BoardState]: set Int->Int {
     { 
         r: Int, c: Int | r = 0 and (
-            let left  = add[c, -1] |
-            let right = add[c,  1] |
-            ((0->left)  in pre.alive and (0->c) not in pre.alive and (0->right) not in pre.alive)
-            or
-            ((0->left) not in pre.alive and (0->c)  in pre.alive and (0->right)  in pre.alive)
-            or
-            ((0->left) not in pre.alive and (0->c)  in pre.alive and (0->right) not in pre.alive)
-            or
-            ((0->left) not in pre.alive and (0->c) not in pre.alive and (0->right) in pre.alive)
+            (leftState[pre, c] and not centerState[pre, c] and not rightState[pre, c]) or  // 100
+            (not leftState[pre, c] and centerState[pre, c] and rightState[pre, c]) or      // 011
+            (not leftState[pre, c] and centerState[pre, c] and not rightState[pre, c]) or  // 010
+            (not leftState[pre, c] and not centerState[pre, c] and rightState[pre, c])     // 001
         )
     }
 }
@@ -104,18 +108,13 @@ pred rule30step[pre, post: BoardState] {
     post.alive = rule30next[pre]
 }
 
-fun rule90next[pre, post: BoardState]: set Int->Int {
+fun rule90next[pre: BoardState]: set Int->Int {
     {
         r: Int, c: Int | r = 0 and (
-            let left  = add[c, -1] |
-            let right = add[c,  1] |
-            ((0->left)  in pre.alive and (0->c)  in pre.alive and (0->right) not in pre.alive)
-            or
-            ((0->left)  in pre.alive and (0->c) not in pre.alive and (0->right) not in pre.alive)
-            or
-            ((0->left) not in pre.alive and (0->c)  in pre.alive and (0->right)  in pre.alive)
-            or
-            ((0->left) not in pre.alive and (0->c) not in pre.alive and (0->right) in pre.alive)
+            (leftState[pre, c] and centerState[pre, c] and not rightState[pre, c]) or     // 110
+            (leftState[pre, c] and not centerState[pre, c] and not rightState[pre, c]) or // 100
+            (not leftState[pre, c] and centerState[pre, c] and rightState[pre, c]) or     // 011
+            (not leftState[pre, c] and not centerState[pre, c] and rightState[pre, c])    // 001
         )
     }
 }
@@ -124,27 +123,18 @@ pred rule90step[pre, post: BoardState] {
     post.alive = rule90next[pre]
 }
 
-fun rule110next[pre, post: BoardState]: set Int->Int {
+fun rule110next[pre: BoardState]: set Int->Int {
     {
         r: Int, c: Int | r = 0 and (
-            let left  = add[c, -1] |
-            let right = add[c,  1] |
-            ((0->left)  in pre.alive and (0->c)  in pre.alive and (0->right) not in pre.alive)
-            or
-            // 101 -> 1
-            ((0->left)  in pre.alive and (0->c) not in pre.alive and (0->right) in pre.alive)
-            or
-            // 011 -> 1
-            ((0->left) not in pre.alive and (0->c)  in pre.alive and (0->right)  in pre.alive)
-            or
-            // 010 -> 1
-            ((0->left) not in pre.alive and (0->c)  in pre.alive and (0->right) not in pre.alive)
-            or
-            // 001 -> 1
-            ((0->left) not in pre.alive and (0->c) not in pre.alive and (0->right) in pre.alive)
+            (leftState[pre, c] and centerState[pre, c] and not rightState[pre, c]) or     // 110
+            (leftState[pre, c] and not centerState[pre, c] and rightState[pre, c]) or     // 101
+            (not leftState[pre, c] and centerState[pre, c] and rightState[pre, c]) or     // 011
+            (not leftState[pre, c] and centerState[pre, c] and not rightState[pre, c]) or // 010
+            (not leftState[pre, c] and not centerState[pre, c] and rightState[pre, c])    // 001
         )
     }
 }
+
 
 pred rule110step[pre, post: BoardState] {
     post.alive = rule110next[pre]
@@ -181,7 +171,6 @@ OneDrule110: run {
     trace
 } for exactly 12 BoardState, 5 Int
 
-
 --========================================================--
 --  TWINS                                                 --
 --========================================================--
@@ -196,16 +185,23 @@ pred twin_r30[bs, other: BoardState] {
     }
 }
 
-// NOTE: again, boundedness issues might not necessarily mean its a twin
-findR30Twin: assert {
+// NOTE: what is sound is finding "exact" twins
+r30_findExactTwin: run {
     board1D
-    no disj s1, s2: BoardState | {
+    some disj s1, s2: BoardState | {
         some s1.alive
         some s2.alive
         s1.alive != s2.alive
-        twin_r30[s1, s2]
+        rule30next[s1] = rule30next[s2]
     }
-} is unsat for exactly 32 BoardState, 5 Int
+} for exactly 2 BoardState, 5 Int
+
+
+
+--========================================================--
+--  PROPERTY PREDICATES                                --
+--========================================================--
+
 
 
 
@@ -213,21 +209,9 @@ findR30Twin: assert {
 --  GARDENS OF EDENS                                      --
 --========================================================--
 
-// if test fails, firstState is a candidate GoE
-// NOTE: this is a candidate GoE *given the bounds*
-rule30GoE: assert {
-    board1D 
-    some Board.firstState.alive
-    no pre: BoardState | rule30step[pre, Board.firstState]
-} is unsat for exactly 32 BoardState, 5 Int
-
-// if test fails, firstState found a candidate GoE
-rule90GoE: assert {
-    board1D 
-    some Board.firstState.alive
-    no pre: BoardState | rule90step[pre, Board.firstState]
-} is unsat for /*exactly 32 BoardState,*/ 5 Int
-
+/*
+    NOTE: refactored. see search.frg
+*/
 
 // possible expansions
 // - given a configuration, attempt to verify if it's orphan or not
@@ -236,16 +220,11 @@ rule90GoE: assert {
 // - find more orphans by restricting boring configurations
 // - bijective <=> twins
 
-rule110findOrphan: run {
-    wellformed
-    board1D
-    all s: BoardState | some Board.next[s] implies rule110step[s,  Board.next[s]]
-    some s: BoardState | r110isOrphan[s]
-} for exactly 5 BoardState, 4 Int
-
 // should be unsat!! but generates instances
 // probable explanation is that rule 90 is surjective in infinite grids, but because
 // it is limited to a wrap-around board, it may not be surjective anymore
+
+/*
 rule90GoE: run {
     wellformed
     board1D
@@ -253,6 +232,14 @@ rule90GoE: run {
     some Board.firstState.alive
     garden_of_eden_r90
 } for exactly 3 BoardState, 5 Int
+
+rule110findOrphan: run {
+    wellformed
+    board1D
+    all s: BoardState | some Board.next[s] implies rule110step[s,  Board.next[s]]
+    some s: BoardState | r110isOrphan[s]
+} for exactly 5 BoardState, 4 Int
+
 
 rule110GoE: run {
     wellformed
@@ -278,3 +265,4 @@ pred r110isOrphan[s: BoardState] {
         }
     }
 }
+*/
