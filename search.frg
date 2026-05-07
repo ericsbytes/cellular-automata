@@ -35,6 +35,7 @@ rule184GoE: assert {
     no pre: BoardState | rule184step[pre, Board.firstState]
 } is unsat for /*exactly 32 BoardState,*/ 5 Int
 
+
 --========================================================--
 --  GARDENS OF EDENS WITH CONSTRAINTS                     --
 --========================================================--

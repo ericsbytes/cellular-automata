@@ -34,6 +34,7 @@ pred wellformed {
 
 assert wellformed is sat
 
+// make board 1 dimensional
 pred board1D {
     all s: BoardState | {
         all r, c: Int | (r->c) in s.alive implies {
@@ -64,6 +65,7 @@ pred rightState[pre: BoardState, c: Int] { (0->right[c]) in pre.alive }
 --  RULES                                                 --
 --========================================================--
 
+// rule 30 transition predicate
 fun rule30next[pre: BoardState]: set Int->Int {
     { 
         r: Int, c: Int | r = 0 and (
@@ -198,16 +200,12 @@ pred rule45step[pre, post: BoardState] {
 fun rule67next[pre: BoardState]: set Int->Int {
     {
         r: Int, c: Int | r = 0 and (
-            let left  = add[c, -1] |
-            let right = add[c,  1] |
             // 110 -> 1
-            ((0->left)  in pre.alive and (0->c) in pre.alive and (0->right) not in pre.alive)
-            or
+            (leftState[pre, c] and centerState[pre, c] and not rightState[pre, c]) or 
             // 001 -> 1
-            ((0->left) not in pre.alive and (0->c) not in pre.alive and (0->right) in pre.alive)
-            or 
+            (not leftState[pre, c] and not centerState[pre, c] and rightState[pre, c]) or 
             // 000 -> 1
-            ((0->left) not in pre.alive and (0->c) not in pre.alive and (0->right) not in pre.alive)
+            (not leftState[pre, c] and not centerState[pre, c] and not rightState[pre, c])
         )
     }
 }
@@ -234,18 +232,18 @@ r30Trace: run {
     trace
 } for exactly 8 BoardState, 5 Int
 
-r90Trace: run {
-    all s: BoardState | some Board.next[s] implies rule90step[s,  Board.next[s]]
+r45Trace: run {
+    all s: BoardState | some Board.next[s] implies rule45step[s,  Board.next[s]]
     trace
-} for exactly 12 BoardState, 5 Int 
+} for exactly 8 BoardState, 5 Int
 
-r110Trace: run {
-    all s: BoardState | some Board.next[s] implies rule110step[s,  Board.next[s]]
+r60Trace: run {
+    all s: BoardState | some Board.next[s] implies rule60step[s,  Board.next[s]]
     trace
-} for exactly 12 BoardState, 5 Int
+} for exactly 8 BoardState, 5 Int
 
-r184Trace: run {
-    all s: BoardState | some Board.next[s] implies rule184step[s,  Board.next[s]]
+r67Trace: run {
+    all s: BoardState | some Board.next[s] implies rule67step[s,  Board.next[s]]
     trace
 } for exactly 12 BoardState, 5 Int
 
@@ -254,8 +252,28 @@ r73Trace: run {
     trace
 } for exactly 12 BoardState, 5 Int
 
-r67Trace: run {
-    all s: BoardState | some Board.next[s] implies rule67step[s,  Board.next[s]]
+r90Trace: run {
+    all s: BoardState | some Board.next[s] implies rule90step[s,  Board.next[s]]
+    trace
+} for exactly 12 BoardState, 5 Int 
+
+r102Trace: run {
+    all s: BoardState | some Board.next[s] implies rule102step[s,  Board.next[s]]
+    trace
+} for exactly 8 BoardState, 5 Int
+
+r110Trace: run {
+    all s: BoardState | some Board.next[s] implies rule110step[s,  Board.next[s]]
+    trace
+} for exactly 12 BoardState, 5 Int
+
+r170Trace: run {
+    all s: BoardState | some Board.next[s] implies rule170step[s,  Board.next[s]]
+    trace
+} for exactly 12 BoardState, 5 Int
+
+r184Trace: run {
+    all s: BoardState | some Board.next[s] implies rule184step[s,  Board.next[s]]
     trace
 } for exactly 12 BoardState, 5 Int
 
