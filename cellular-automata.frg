@@ -108,6 +108,10 @@ pred board2D[rowSize, colSize: Int] {
     }
 }
 
+--========================================================--
+--  RULES                                                 --
+--========================================================--
+
 pred rule30step[pre, post: BoardState] {
     post.alive = {
         r: Int, c: Int | r = 0 and (
@@ -162,27 +166,6 @@ pred rule110step[pre, post: BoardState] {
     }
 }
 
-pred garden_of_eden_r30 {
-    no prev: BoardState | {
-        prev != Board.firstState
-        rule30step[prev, Board.firstState]
-    }
-}
-
-pred garden_of_eden_r90 {
-    no prev: BoardState | {
-        prev != Board.firstState
-        rule90step[prev, Board.firstState]
-    }
-}
-
-pred garden_of_eden_r110 {
-    no prev: BoardState | {
-        prev != Board.firstState
-        rule110step[prev, Board.firstState]
-    }
-}
-
 // pred twin[s1, s2: BoardState] {
 //     some dx, dy: Int | {
 //         s2.alive = { r: Int, c: Int | add[r, dx]->add[c, dy] in s1.alive }
@@ -218,6 +201,11 @@ findTwin: run {
     }
 } for 8 BoardState, 5 Int
 
+--========================================================--
+--  TRACES                                                --
+--========================================================--
+
+
 pred trace {
     wellformed
     Board.firstState.alive = 0->7
@@ -245,7 +233,7 @@ OneDrule110: run {
 } for exactly 12 BoardState, 5 Int
 
 --========================================================--
---  VERIFIER                                              --
+--  GARDENS OF EDENS                                      --
 --========================================================--
 
 
@@ -255,7 +243,7 @@ rule30GoE: assert {
     board1D 
     some Board.firstState.alive
     no pre: BoardState | rule30step[pre, Board.firstState]
-} is unsat for /*exactly 32 BoardState,*/ 5 Int
+} is unsat for exactly 32 BoardState, 5 Int
 
 // if test fails, firstState found a candidate GoE
 rule90GoE: assert {
