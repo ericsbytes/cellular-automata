@@ -30,12 +30,7 @@ pred wellformed {
 // can reach s2 from s1
 pred reachable[s1, s2: BoardState] {
     s2 in s1.^(Board.next)
-}
-
-pred init {
-    // we want init state to be something that forge simulates, not chosen by us right
-}
-
+}å
 
 
 // thanks tim
@@ -215,16 +210,19 @@ pred r110isOrphan[s: BoardState] {
     }
 }
 
-pred twin[s1, s2: BoardState] {
-    some dx, dy: Int | {
-        s2.alive = { r: Int, c: Int | add[r, dx]->add[c, dy] in s1.alive }
-    }
-}
-
 pred twin_r30[bs, other: BoardState] {
     all s1, s2, nxt1, nxt2: BoardState | {
         s2.alive = (s1.alive - bs.alive) + other.alive
-        s1 != s2
+        s1.alive != s2.alive
+        rule30step[s1, nxt1]
+        rule30step[s2, nxt2]
+    } implies nxt1.alive = nxt2.alive
+    
+    -- ensure symmetry
+    all s1, s2, nxt1, nxt2: BoardState | {
+        s2.alive = (s1.alive - other.alive) + bs.alive
+        s1.alive != s2.alive
+        rule30step[s1, nxt1]
         rule30step[s2, nxt2]
     } implies nxt1.alive = nxt2.alive
 }
@@ -238,13 +236,6 @@ findTwin: run {
         bs.alive != other.alive
 
         twin_r30[bs, other]
-
-        -- find some twin
-        some s1, s2, nxt1, nxt2: BoardState | {
-            s2.alive = (s1.alive - bs.alive) + other.alive
-            rule30step[s1, nxt1]
-            rule30step[s2, nxt2]
-        }
     }
 } for 8 BoardState, 5 Int
 
@@ -274,13 +265,31 @@ OneDrule110: run {
     trace
 } for exactly 12 BoardState, 5 Int
 
-rule30GoE: run {
-    wellformed
-    board1D
-    all s: BoardState | some Board.next[s] implies rule30step[s,  Board.next[s]]
+--========================================================--
+--  VERIFIER                                              --
+--========================================================--
+
+// if test fails, firstState found a candidate GoE
+rule30GoE: assert {
+    board1D 
     some Board.firstState.alive
-    garden_of_eden_r30
-} for exactly 3 BoardState, 5 Int
+    no pre: BoardState | rule30step[pre, Board.firstState]
+} is unsat for /*exactly 32 BoardState,*/ 5 Int
+
+// if test fails, firstState found a candidate GoE
+rule90GoE: assert {
+    board1D 
+    some Board.firstState.alive
+    no pre: BoardState | rule90step[pre, Board.firstState]
+} is unsat for /*exactly 32 BoardState,*/ 5 Int
+
+
+// possible expansions
+// - given a configuration, attempt to verify if it's orphan or not
+// - attempt to verify twins <=> orphans
+// - verify that when a rule is not supposed to have orphans, it doesn't generate orphans
+// - find more orphans by restricting boring configurations
+// - bijective <=> twins
 
 rule110findOrphan: run {
     wellformed
@@ -308,12 +317,3 @@ rule110GoE: run {
     
     garden_of_eden_r110
 }
-
-
-
-// possible expansions
-// - given a configuration, attempt to verify if it's orphan or not
-// - attempt to verify twins <=> orphans
-// - verify that when a rule is not supposed to have orphans, it doesn't generate orphans
-// - find more orphans by restricting boring configurations
-// - bijective <=> twins

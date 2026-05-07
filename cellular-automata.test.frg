@@ -47,18 +47,7 @@ test suite for rule110step {
     //     `s2.alive = none->none
     // }
 
-    r110_verifyKnownOrphan: assert {
-        wellformed
-        board1D
-        r110linearity
-        some s: BoardState | {
-            some orphan: BoardState | {
-                s != orphan
-                orphan.alive = (0->1) + (0->3)
-                rule110step[s, orphan]
-            }
-        }
-    } is unsat for exactly 3 BoardState, 4 Int
+    
 }
 
 r110_goeExists: assert { // might be buggy
@@ -68,9 +57,9 @@ r110_goeExists: assert { // might be buggy
     garden_of_eden_r110
 } is sat for exactly 3 BoardState, 4 Int
 
-r30_goeIffTwin: assert {
-    twin
-}
+// r30_goeIffTwin: assert {
+    
+// }
 
 test suite for rule90step {
     r90_goeExists: assert {
@@ -82,3 +71,39 @@ test suite for rule90step {
 
     // r90_all
 }
+
+r110_verifyKnownOrphan: assert {
+    wellformed
+    board1D
+    r110linearity
+    some s: BoardState | {
+        some orphan: BoardState | {
+            s != orphan
+            orphan.alive = (0->1) + (0->3)
+            rule110step[s, orphan]
+        }
+    }
+} is unsat for exactly 3 BoardState, 4 Int
+
+// a rule 30 GoE
+verifyGoE1: assert {
+    board1D
+    
+    // change for rule
+    some pre: BoardState | rule30step[pre, Board.firstState]
+    
+    // change pattern to verify GoE
+    Board.firstState.alive = (0->-16) + (0->-15) + (0->-14) + (0->-13) + (0->-12) + (0->-11) + (0->-10) + (0->-9) + (0->-8) + (0->-7) + (0->-6) + (0->-5) + (0->-4) + (0->-3) + (0->-2) + (0->-1) + (0->0) + (0->1) + (0->2) + (0->3) + (0->4) + (0->5) + (0->6) + (0->7) + (0->8) + (0->9) + (0->10) + (0->11) + (0->12) + (0->13) + (0->14) + (0->15)
+} is unsat for exactly 2 BoardState, 5 Int
+
+
+// a rule 90 GoE
+verifyGoE2: assert {
+    board1D
+    
+    // change for rule
+    some pre: BoardState | rule90step[pre, Board.firstState]
+    
+    // change pattern to verify GoE
+    Board.firstState.alive = (0->-16) + (0->-15) + (0->-14) + (0->-13) + (0->-11) + (0->-10) + (0->-8) + (0->-7) + (0->-5) + (0->-4) + (0->-2) + (0->-1) + (0->1) + (0->2) + (0->4) + (0->5) + (0->7) + (0->8) + (0->10) + (0->11) + (0->13) + (0->14)
+} is unsat for exactly 2 BoardState, 5 Int
