@@ -72,7 +72,7 @@ test suite for wellformed {
 // }
 
 --========================================================--
---  VERIFY GARDEN OF EDEN                                 --
+--  VERIFY (KNOWN) GARDEN OF EDEN                         --
 --========================================================--
 
 // a rule 30 GoE
