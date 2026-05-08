@@ -24,7 +24,6 @@ We also utilized the idea of **twins**.
 >
 > In our project, we distinguish between so-called "weak" twins and "strong" twins. Weak twins are essentially two states that share the exact same next state (e.g. the pre-image of some state). Strong twins are two states that share the same next state with the added requirement that they have identical non-zero superset alive cells.
 
-
 > [!NOTE]
 > **The Garden of Eden Theorem (Moore and Myhill):**
 >
@@ -58,9 +57,13 @@ Our goals only slightly changed from our initial proposal, which proposed more v
 
 ### File Guide
 
-* `cellular-automata.frg`: 
-* `search.frg`:
-* `cellular-automata.test.frg`:
+| File                                                       | Description                                                     |
+| ---------------------------------------------------------- | --------------------------------------------------------------- |
+| [`cellular-automata.frg`](cellular-automata.frg)           | General predicates for modelling cellular automata rules.       |
+| [`cellular-automata.test.frg`](cellular-automata.test.frg) | Tests general predicates.                                       |
+| [`search.frg`](search.frg)                                 | Assertions meant to search for twins and GoEs (non-guaranteed). |
+| [`search.test.frg`](search.test.frg)                       | Tests predicates used for searching.        |
+| [`to-board.sh`](to-board.sh)                               | Converts Evaluator set into a Forge syntactic set.        |
 
 ### Sigs
 
@@ -123,11 +126,11 @@ These are split between in [`cellular-automata.frg`](cellular-automata.frg) and 
 | `weak_twins_rule██` | Describes what it measn for "weak" twins to exist -- essentially, the pre-images 2 for some state is at least size 2. |
 | `strong_twin_r██`   | Describes what it measn for "strong" twins to exist.                                                                  |
 
-| Run                  | Description                                     |
-| -------------------- | ----------------------------------------------- |
-| `r██_findWeakTwin` | Soundly find two weak twins for a given rule. |
-| `r██_findTwin` | Finds a candidate strong twin pair. Unsound due to limitations. |
-| `r██_verifyTwin` | Attempts to verify that a pair of twins are indeed twins. Unsound due to limitations. |
+| Run                | Description                                                                           |
+| ------------------ | ------------------------------------------------------------------------------------- |
+| `r██_findWeakTwin` | Soundly find two weak twins for a given rule.                                         |
+| `r██_findTwin`     | Finds a candidate strong twin pair. Unsound due to limitations.                       |
+| `r██_verifyTwin`   | Attempts to verify that a pair of twins are indeed twins. Unsound due to limitations. |
 
 ### Design "Aha!" Moments
 
