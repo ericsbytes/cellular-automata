@@ -98,22 +98,92 @@ test suite for wellformed {
     } is sat for exactly 4 BoardState, 5 Int
 }
 
-test_board1D: assert {
-    board1D
-    some s: BoardState | some r, c: Int | {
-        (r->c) in s.alive
-        r != 0
-    }
-} is unsat for exactly 2 BoardState, 5 Int
+    test_board1D: assert {
+        board1D
+        some s: BoardState | some r, c: Int | {
+            (r->c) in s.alive
+            r != 0
+        }
+    } is unsat for exactly 2 BoardState, 5 Int
+    
+    -- Test board2D violation
+    test_board2D_violation: assert {
+        board2D[3, 3]
+        some s: BoardState | some r, c: Int | {
+            (r->c) in s.alive
+            (r >= 3 or c >= 3)
+        }
+    } is unsat for exactly 2 BoardState, 5 Int
 
--- Test board2D violation
-test_board2D_violation: assert {
-    board2D[3, 3]
-    some s: BoardState | some r, c: Int | {
-        (r->c) in s.alive
-        (r >= 3 or c >= 3)
+
+--========================================================--
+--  Property tests                       --
+--========================================================--
+
+test_rule30_not_additive: assert {
+    board1D
+    all c: Int, s: BoardState | c < -5 or c >= 5 implies (0->c) not in s.alive
+    
+    some disj s1, s2, sXOR, r1, r2, rXOR: BoardState | {
+        sXOR.alive = (s1.alive - s2.alive) + (s2.alive - s1.alive)
+        rule30step[s1, r1]
+        rule30step[s2, r2]
+        rule30step[sXOR, rXOR]
+        rXOR.alive != (r1.alive - r2.alive) + (r2.alive - r1.alive)
     }
-} is unsat for exactly 2 BoardState, 5 Int
+} is sat for exactly 6 BoardState, 4 Int
+
+test_rule60_additive: assert {
+    board1D
+    all c: Int, s: BoardState | c < -5 or c >= 5 implies (0->c) not in s.alive
+    
+    some disj s1, s2, sXOR, r1, r2, rXOR: BoardState | {
+        sXOR.alive = (s1.alive - s2.alive) + (s2.alive - s1.alive)
+        rule60step[s1, r1]
+        rule60step[s2, r2]
+        rule60step[sXOR, rXOR]
+        rXOR.alive != (r1.alive - r2.alive) + (r2.alive - r1.alive)
+    }
+} is unsat for exactly 6 BoardState, 4 Int
+
+test_rule110_not_injective: assert {
+    board1D
+    all c: Int, s: BoardState | c < -5 or c >= 5 implies (0->c) not in s.alive
+    
+    some s1, s2, r1, r2: BoardState | {
+        s1 != s2
+        rule110step[s1, r1]
+        rule110step[s2, r2]
+        r1.alive = r2.alive
+    }
+} is sat for exactly 4 BoardState, 4 Int
+
+test_rule60_not_monotonic: assert {
+    board1D
+    all c: Int, s: BoardState | c < -5 or c >= 5 implies (0->c) not in s.alive
+    
+    some s1, s2, r1, r2: BoardState | {
+        s1.alive in s2.alive
+        rule60step[s1, r1]
+        rule60step[s2, r2]
+        not (r1.alive in r2.alive)
+    }
+} is sat for exactly 5 BoardState, 4 Int
+
+test_rule170_monotonic: assert {
+    board1D
+    all c: Int, s: BoardState | c < -5 or c >= 5 implies (0->c) not in s.alive
+    
+    some s1, s2, r1, r2: BoardState | {
+        s1.alive in s2.alive
+        rule170step[s1, r1]
+        rule170step[s2, r2]
+        not (r1.alive in r2.alive)
+    }
+} is unsat for exactly 5 BoardState, 4 Int
+
+
+
 
 
 --========================================================--
