@@ -143,7 +143,7 @@ We shifted our approach from finding GoEs to instead focusing on verifying them 
 A [visualizer](visualizer.js) is included with this project, generated with the help of Claude.
 
 > [!CAUTION]
-> A visualizer is provided, but it should **only be used for tracing.** The visualizer is not intended to visualize generated candidates for GoEs or twins. We recommend using the Evaluator and the verification systems in [search.frg](search.frg) and [cellular-automata.test.frg](cellular-automata.test.frg) with the associated [to-board.sh](to-board.sh) file to verify and examine Forge-generated candidates.
+> A visualizer is provided, but it should **only be used for tracing and generated Garden of Edens.** The visualizer is not intended to visualize generated candidates for twins. We recommend using the Evaluator and the verification systems in [search.frg](search.frg) and [cellular-automata.test.frg](cellular-automata.test.frg) with the associated [to-board.sh](to-board.sh) file to verify and examine Forge-generated candidates, even for Garden of Edens.
 
 ## Limitations
 
