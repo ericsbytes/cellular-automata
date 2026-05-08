@@ -2,6 +2,7 @@
 
 open "cellular-automata.frg"
 
+
 --========================================================--
 --  HELPER PREDICATES                                     --
 --========================================================--
@@ -23,6 +24,43 @@ pred r110linearity {
         Board.next[s1] = s2 implies rule110step[s1, s2]
     }
 }
+
+
+test_left_right_consistency: assert {
+    board1D
+    some c: Int | {
+        left[c] = add[c, -1]
+        right[c] = add[c, 1]
+        left[right[c]] = c
+        right[left[c]] = c
+    }
+} is sat for exactly 1 BoardState, 5 Int
+
+test_leftState_definition: assert {
+    board1D
+    all s: BoardState | all c: Int | {
+        leftState[s, c] iff (0->left[c]) in s.alive
+    }
+} is sat for exactly 2 BoardState, 5 Int
+
+test_rightState_definition: assert {
+    board1D
+    all s: BoardState | all c: Int | {
+        rightState[s, c] iff (0->right[c]) in s.alive
+    }
+} is sat for exactly 2 BoardState, 5 Int
+
+test_state_predicates_consistency: assert {
+    board1D
+    all s: BoardState | all c: Int | {
+        (leftState[s, c] and centerState[s, c] and rightState[s, c]) implies {
+            (0->left[c]) in s.alive
+            (0->c) in s.alive
+            (0->right[c]) in s.alive
+        }
+    }
+} is sat for exactly 2 BoardState, 5 Int
+
 
 test suite for wellformed {
     -- Test 1: Disconnected states should violate wellformed
@@ -59,6 +97,24 @@ test suite for wellformed {
         all s: BoardState | some Board.next[s] implies rule30step[s, Board.next[s]]
     } is sat for exactly 4 BoardState, 5 Int
 }
+
+test_board1D: assert {
+    board1D
+    some s: BoardState | some r, c: Int | {
+        (r->c) in s.alive
+        r != 0
+    }
+} is unsat for exactly 2 BoardState, 5 Int
+
+-- Test board2D violation
+test_board2D_violation: assert {
+    board2D[3, 3]
+    some s: BoardState | some r, c: Int | {
+        (r->c) in s.alive
+        (r >= 3 or c >= 3)
+    }
+} is unsat for exactly 2 BoardState, 5 Int
+
 
 --========================================================--
 --  RULE SANITY CHECKS                                    --

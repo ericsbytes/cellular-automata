@@ -95,12 +95,38 @@ pred r90_excludedPatterns[s: BoardState] {
     notTranslationOf[s, (0->-15) + (0->-13) + (0->-11) + (0->-9) + (0->-7) + (0->-5) + (0->-3) + (0->-1) + (0->1) + (0->3) + (0->5) + (0->7) + (0->9) + (0->11) + (0->13) + (0->15)]
 }
 
+
 rule90GoE_blockedList: assert {
     board1D 
     some Board.firstState.alive
     no pre: BoardState | rule90step[pre, Board.firstState]
     r90_excludedPatterns[Board.firstState]
 } is unsat for exactly 128 BoardState, 5 Int
+
+
+
+pred r60_excludedPatterns[s: BoardState] {
+    //  Goe's
+notTranslationOf[s, (0->0) + (0->1) + (0->2) + (0->3) + (0->6)]
+notTranslationOf[s, (0->5) + (0->6) + (0->10) + (0->12) + (0->14)]
+notTranslationOf[s, (0->6) + (0->9) + (0->10) + (0->12) + (0->14)]
+notTranslationOf[s, (0->10)]
+notTranslationOf[s, (0->3) + (0->6) + (0->10) + (0->12) + (0->14)]
+notTranslationOf[s, (0->6) + (0->11) + (0->12) + (0->13) + (0->14)]
+notTranslationOf[s, (0->2) + (0->6) + (0->12) + (0->13) + (0->14)]
+notTranslationOf[s, (0->5) + (0->6) + (0->12) + (0->13) + (0->14)]
+
+notTranslationOf[s,(0->0) + (0->2) + (0->4) + (0->6) + (0->8)]
+notTranslationOf[s,(0->0) + (0->2) + (0->4) + (0->8)]
+
+}
+
+rule60GoE_blockedList: assert {
+    board1D 
+    some Board.firstState.alive
+    no pre: BoardState | rule60step[pre, Board.firstState]
+    r60_excludedPatterns[Board.firstState]
+} is unsat for exactly 1 BoardState, 5 Int
 
 verifyGoE: assert {
     board1D
@@ -111,6 +137,7 @@ verifyGoE: assert {
     // change pattern to verify GoE
     Board.firstState.alive = (0->-15) + (0->-13) + (0->-11) + (0->-9) + (0->-7) + (0->-5) + (0->-3) + (0->-1) + (0->1) + (0->3) + (0->5) + (0->7) + (0->9) + (0->11) + (0->13) + (0->14) + (0->15)
 } is unsat for exactly 2 BoardState, 5 Int
+
 
 --========================================================--
 --  TWINS                                                 --
