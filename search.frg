@@ -16,11 +16,41 @@ rule30GoE: assert {
     no pre: BoardState | rule30step[pre, Board.firstState]
 } is unsat for exactly 32 BoardState, 5 Int
 
+rule45GoE: assert {
+    board1D 
+    some Board.firstState.alive
+    no pre: BoardState | rule45step[pre, Board.firstState]
+} is unsat for /*exactly 32 BoardState,*/ 5 Int
+
+rule60GoE: assert {
+    board1D 
+    some Board.firstState.alive
+    no pre: BoardState | rule60step[pre, Board.firstState]
+} is unsat for /*exactly 32 BoardState,*/ 5 Int
+
+rule67GoE: assert {
+    board1D 
+    some Board.firstState.alive
+    no pre: BoardState | rule67step[pre, Board.firstState]
+} is unsat for /*exactly 32 BoardState,*/ 5 Int
+
+rule73GoE: assert {
+    board1D 
+    some Board.firstState.alive
+    no pre: BoardState | rule45step[pre, Board.firstState]
+} is unsat for /*exactly 32 BoardState,*/ 5 Int
+
 // if test fails, firstState is a candidate GoE
 rule90GoE: assert {
     board1D 
     some Board.firstState.alive
     no pre: BoardState | rule90step[pre, Board.firstState]
+} is unsat for /*exactly 32 BoardState,*/ 5 Int
+
+rule102GoE: assert {
+    board1D 
+    some Board.firstState.alive
+    no pre: BoardState | rule45step[pre, Board.firstState]
 } is unsat for /*exactly 32 BoardState,*/ 5 Int
 
 rule110GoE: assert {
@@ -29,11 +59,18 @@ rule110GoE: assert {
     no pre: BoardState | rule110step[pre, Board.firstState]
 } is unsat for /*exactly 32 BoardState,*/ 5 Int
 
+rule170GoE: assert {
+    board1D 
+    some Board.firstState.alive
+    no pre: BoardState | rule45step[pre, Board.firstState]
+} is unsat for /*exactly 32 BoardState,*/ 5 Int
+
 rule184GoE: assert {
     board1D 
     some Board.firstState.alive
     no pre: BoardState | rule184step[pre, Board.firstState]
 } is unsat for /*exactly 32 BoardState,*/ 5 Int
+
 
 
 --========================================================--
