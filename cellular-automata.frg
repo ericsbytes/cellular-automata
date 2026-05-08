@@ -140,9 +140,9 @@ fun rule170next[pre: BoardState]: set Int->Int {
         r: Int, c: Int | r = 0 and (
             // Cases where left neighbor is alive (1)
             (leftState[pre, c] and centerState[pre, c] and rightState[pre, c]) or     // 111
-            (leftState[pre, c] and centerState[pre, c] and not rightState[pre, c]) or // 110
+            (not leftState[pre, c] and centerState[pre, c] and rightState[pre, c]) or // 011
             (leftState[pre, c] and not centerState[pre, c] and rightState[pre, c]) or // 101
-            (leftState[pre, c] and not centerState[pre, c] and not rightState[pre, c])    // 100
+            (not leftState[pre, c] and not centerState[pre, c] and rightState[pre, c])    // 001
         )
     }
 }

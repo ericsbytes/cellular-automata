@@ -60,16 +60,229 @@ test suite for wellformed {
     } is sat for exactly 4 BoardState, 5 Int
 }
 
-// test suite for rule110step {
-//     r110_invalidStep: assert {
-//         some disj s1, s2: BoardState | {
-//             Board.next[s1] = s2
-//             rule110step[s1, s2]
-//             s1.alive 
-//         }
-//     }
-    
-// }
+--========================================================--
+--  RULE SANITY CHECKS                                    --
+--========================================================--
+
+r30_shouldBeDead: assert {
+    wellformed
+    some disj s1, s2: BoardState | {
+        rule30step[s1, s2]
+
+        some c: Int | {
+            (
+                // 111 -> 0
+                (leftState[s1, c] and centerState[s1, c] and rightState[s1, c]) or
+                // 110 -> 0
+                (leftState[s1, c] and centerState[s1, c] and not rightState[s1, c]) or
+                // 101 -> 0
+                (leftState[s1, c] and not centerState[s1, c] and rightState[s1, c]) or
+                // 000 -> 0
+                (not leftState[s1, c] and not centerState[s1, c] and not rightState[s1, c])
+            )
+            (0->c) in s2.alive
+            
+        }
+    }
+} is unsat for exactly 2 BoardState, 5 Int
+
+r45_shouldBeDead: assert {
+    wellformed
+    some disj s1, s2: BoardState | {
+        rule45step[s1, s2]
+
+        some c: Int | {
+            (
+                // 111 -> 0
+                (leftState[s1, c] and centerState[s1, c] and rightState[s1, c]) or
+                // 110 -> 0
+                (leftState[s1, c] and centerState[s1, c] and not rightState[s1, c]) or
+                // 100 -> 0
+                (leftState[s1, c] and not centerState[s1, c] and not rightState[s1, c]) or
+                // 001 -> 0
+                (not leftState[s1, c] and not centerState[s1, c] and rightState[s1, c])
+            )
+            (0->c) in s2.alive
+        }
+    }
+} is unsat for exactly 2 BoardState, 5 Int
+
+r60_shouldBeDead: assert {
+    wellformed
+    some disj s1, s2: BoardState | {
+        rule60step[s1, s2]
+
+        some c: Int | {
+            (
+                // 111 -> 0
+                (leftState[s1, c] and centerState[s1, c] and rightState[s1, c]) or
+                // 110 -> 0
+                (leftState[s1, c] and centerState[s1, c] and not rightState[s1, c]) or
+                // 001 -> 0
+                (not leftState[s1, c] and not centerState[s1, c] and rightState[s1, c]) or
+                // 000 -> 0
+                (not leftState[s1, c] and not centerState[s1, c] and not rightState[s1, c])
+            )
+            (0->c) in s2.alive
+            
+        }
+    }
+} is unsat for exactly 2 BoardState, 5 Int
+
+r67_shouldBeDead: assert {
+    wellformed
+    some disj s1, s2: BoardState | {
+        rule67step[s1, s2]
+
+        some c: Int | {
+            (
+                // 111 -> 0
+                (leftState[s1, c] and centerState[s1, c] and rightState[s1, c]) or
+                // 101 -> 0
+                (leftState[s1, c] and not centerState[s1, c] and rightState[s1, c]) or
+                // 100 -> 0
+                (leftState[s1, c] and not centerState[s1, c] and not rightState[s1, c]) or
+                // 011 -> 0
+                (not leftState[s1, c] and centerState[s1, c] and rightState[s1, c]) or
+                // 010 -> 0
+                (not leftState[s1, c] and centerState[s1, c] and not rightState[s1, c])
+            )
+            (0->c) in s2.alive
+            
+        }
+    }
+} is unsat for exactly 2 BoardState, 5 Int
+
+r73_shouldBeDead: assert {
+    wellformed
+    some disj s1, s2: BoardState | {
+        rule73step[s1, s2]
+
+        some c: Int | {
+            (
+                // 111 -> 0
+                (leftState[s1, c] and centerState[s1, c] and rightState[s1, c]) or
+                // 101 -> 0
+                (leftState[s1, c] and not centerState[s1, c] and rightState[s1, c]) or
+                // 100 -> 0
+                (leftState[s1, c] and not centerState[s1, c] and not rightState[s1, c]) or
+                // 010 -> 0
+                (not leftState[s1, c] and centerState[s1, c] and not rightState[s1, c]) or
+                // 001 -> 0
+                (not leftState[s1, c] and not centerState[s1, c] and rightState[s1, c])
+            )
+            (0->c) in s2.alive
+            
+        }
+    }
+} is unsat for exactly 2 BoardState, 5 Int
+
+r90_shouldBeDead: assert {
+    wellformed
+    some disj s1, s2: BoardState | {
+        rule90step[s1, s2]
+
+        some c: Int | {
+            (
+                // 111 -> 0
+                (leftState[s1, c] and centerState[s1, c] and rightState[s1, c]) or
+                // 101 -> 0
+                (leftState[s1, c] and not centerState[s1, c] and rightState[s1, c]) or
+                // 010 -> 0
+                (not leftState[s1, c] and centerState[s1, c] and not rightState[s1, c]) or
+                // 000 -> 0
+                (not leftState[s1, c] and not centerState[s1, c] and not rightState[s1, c])
+            )
+            (0->c) in s2.alive
+            
+        }
+    }
+} is unsat for exactly 2 BoardState, 5 Int
+
+r102_shouldBeDead: assert {
+    wellformed
+    some disj s1, s2: BoardState | {
+        rule102step[s1, s2]
+
+        some c: Int | {
+            (
+                // 111 -> 0
+                (leftState[s1, c] and centerState[s1, c] and rightState[s1, c]) or
+                // 100 -> 0
+                (leftState[s1, c] and not centerState[s1, c] and not rightState[s1, c]) or
+                // 011 -> 0
+                (not leftState[s1, c] and centerState[s1, c] and rightState[s1, c]) or
+                // 000 -> 0
+                (not leftState[s1, c] and not centerState[s1, c] and not rightState[s1, c])
+            )
+            (0->c) in s2.alive
+            
+        }
+    }
+} is unsat for exactly 2 BoardState, 5 Int
+
+r110_shouldBeDead: assert {
+    wellformed
+    some disj s1, s2: BoardState | {
+        rule110step[s1, s2]
+
+        some c: Int | {
+            (
+                // 111 -> 0
+                (leftState[s1, c] and centerState[s1, c] and rightState[s1, c]) or
+                // 100 -> 0
+                (leftState[s1, c] and not centerState[s1, c] and not rightState[s1, c]) or
+                // 000 -> 0
+                (not leftState[s1, c] and not centerState[s1, c] and not rightState[s1, c])
+            )
+            (0->c) in s2.alive
+            
+        }
+    }
+} is unsat for exactly 2 BoardState, 5 Int
+
+r170_shouldBeDead: assert {
+    wellformed
+    some disj s1, s2: BoardState | {
+        rule170step[s1, s2]
+
+        some c: Int | {
+            (
+                // 110 -> 0
+                (leftState[s1, c] and centerState[s1, c] and not rightState[s1, c]) or
+                // 100 -> 0
+                (leftState[s1, c] and not centerState[s1, c] and not rightState[s1, c]) or
+                // 010 -> 0
+                (not leftState[s1, c] and centerState[s1, c] and not rightState[s1, c]) or
+                // 000 -> 0
+                (not leftState[s1, c] and not centerState[s1, c] and not rightState[s1, c])
+            )
+            (0->c) in s2.alive
+        }
+    }
+} is unsat for exactly 2 BoardState, 5 Int
+
+r184_shouldBeDead: assert {
+    wellformed
+    some disj s1, s2: BoardState | {
+        rule184step[s1, s2]
+
+        some c: Int | {
+            (
+                // 110 -> 0
+                (leftState[s1, c] and centerState[s1, c] and not rightState[s1, c]) or
+                // 010 -> 0
+                (not leftState[s1, c] and centerState[s1, c] and not rightState[s1, c]) or
+                // 001 -> 0
+                (not leftState[s1, c] and not centerState[s1, c] and rightState[s1, c]) or
+                // 000 -> 0
+                (not leftState[s1, c] and not centerState[s1, c] and not rightState[s1, c])
+            )
+            (0->c) in s2.alive
+            
+        }
+    }
+} is unsat for exactly 2 BoardState, 5 Int
 
 --========================================================--
 --  VERIFY (KNOWN) GARDEN OF EDEN                         --
